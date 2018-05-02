@@ -1,0 +1,41 @@
+version: '2'
+services:
+  web:
+    build:
+      context: .
+    volumes:
+      - .:/var/www/html
+    links:
+      - db:mysql
+    environment:
+      - VIRTUAL_HOST=syncthing.docker
+    networks:
+      - proxy-tier
+  db:
+    image: mysql
+    volumes:
+      - ./.mysqldata:/var/lib/mysql
+    ports:
+      - "33306:3306"
+    environment:
+      - MYSQL_DATABASE=syncthing
+      - MYSQL_USER=syncthing
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_PASSWORD=secret
+    networks:
+      - proxy-tier
+  proxy:
+    image: jwilder/nginx-proxy
+    container_name: syncthing-proxy
+    ports:
+      - "80:80"
+    volumes:
+       - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - proxy-tier
+
+
+networks:
+  proxy-tier:
+    external:
+      name: nginx-proxy
