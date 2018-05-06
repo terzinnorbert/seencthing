@@ -5,6 +5,7 @@ services:
       context: .
     volumes:
       - .:/var/www/html
+      - ./.syncthing:/root/.config/syncthing
     links:
       - db:mysql
     environment:

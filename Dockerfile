@@ -10,11 +10,17 @@ RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -
     gnupg2 && curl -sL https://deb.nodesource.com/setup_9.x | bash -  && \
     apt-get install -y nodejs && \
     curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer && \
-    a2enmod rewrite expires
+    a2enmod rewrite expires && \
+    apt-get clean
+
+RUN curl -s https://syncthing.net/release-key.txt | apt-key add - && \
+    echo "deb https://apt.syncthing.net/ syncthing stable" | tee /etc/apt/sources.list.d/syncthing.list && \
+    apt-get update && apt-get install -y syncthing && \
+    apt-get clean
 
 COPY docker/docker-cmd /usr/local/bin/
 COPY docker/apache.conf /etc/apache2/sites-enabled/000-default.conf
 WORKDIR /var/www/html
-EXPOSE 80
+EXPOSE 80 8384
 
 CMD ["docker-cmd"]
