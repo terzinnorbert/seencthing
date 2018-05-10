@@ -28,4 +28,20 @@ class Folder extends Model
     {
         return $this->hasMany(Directory::class);
     }
+
+    public function getStatus()
+    {
+        return app(Rest::class)->getDbStatus($this->name);
+    }
+
+    public static function fileSize($size, $delimiter = 2)
+    {
+        $labels = 'kMGTPEZY';
+        $separator = (int)floor((strlen($size) - 1) / 3);
+
+        return sprintf(
+                "%.{$delimiter}f",
+                $size / pow(1024, $separator)
+            ).' '.($separator ? $labels[$separator - 1] : '').'B';
+    }
 }

@@ -14,12 +14,16 @@
 Route::get(
     '/',
     function () {
-        return view('welcome');
+        if (!Auth::user()) {
+            return redirect('/home');
+        }
+
+        return redirect('/folders');
     }
 );
 
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/folder', 'FolderController@folders');
-Route::get('/folder/{folder}', 'FolderController@files');
+Route::get('/folders', 'FolderController@index')->name('folders');
+Route::get('/folders/{folder}', 'DirectoryController@listing')->name('files');

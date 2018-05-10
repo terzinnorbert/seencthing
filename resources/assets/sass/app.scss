@@ -1,11 +1,12 @@
 // Fonts
-@import url("https://fonts.googleapis.com/css?family=Raleway:300,400,600");
+@import url("https://fonts.googleapis.com/css?family=Roboto");
+@import url("https://use.fontawesome.com/releases/v5.0.12/css/all.css");
 // Variables
 @import "variables";
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
 
-.navbar-laravel {
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+body {
+    padding-top: 5rem;
+    font-family: "Roboto";
 }

@@ -94,4 +94,14 @@ class Directory extends Model
     {
         return $query->where('parent_id', $parentId);
     }
+
+    public function isFile()
+    {
+        return self::TYPE_FILE === $this->type;
+    }
+
+    public function isFolder()
+    {
+        return !$this->isFile();
+    }
 }

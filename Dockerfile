@@ -4,7 +4,7 @@ MAINTAINER Terzin Norbert <terzin.norbert@gmail.com>
 
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y software-properties-common && \
     LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php && apt-get update && apt-get install -y \
-    curl acl git unzip \
+    curl acl git unzip gcc make libpng-dev \
     apache2 libapache2-mod-php7.2 php7.2 php7.2-xml php7.2-gd php7.2-opcache php7.2-mbstring \
     php7.2-mysql php7.2-tidy php7.2-curl php7.2-sqlite3 php7.2-xdebug \
     gnupg2 && curl -sL https://deb.nodesource.com/setup_9.x | bash -  && \
