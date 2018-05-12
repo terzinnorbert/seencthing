@@ -17,10 +17,10 @@ class CreateDirectoriesTable extends Migration
             'directories',
             function (Blueprint $table) {
                 $table->increments('id');
-                $table->unsignedInteger('parent_id');
                 $table->unsignedInteger('folder_id');
                 $table->integer('type');
                 $table->string('name');
+                $table->string('path')->default('/');
                 $table->unsignedInteger('size')->default(0);
                 $table->datetime('modification_time');
                 $table->datetime('sync_time');

@@ -10,6 +10,9 @@ let mix = require('laravel-mix');
  | file for the application as well as bundling up all the JS files.
  |
  */
-
 mix.js('resources/assets/js/app.js', 'public/js')
-    .sass('resources/assets/sass/app.scss', 'public/css');
+    .js('resources/assets/js/directory.ts', 'public/js')
+    .sass('resources/assets/sass/app.scss', 'public/css')
+    .autoload({
+        jquery: ['$', 'global.jQuery', "jQuery", "global.$", "jquery", "global.jquery"]
+    });

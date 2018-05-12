@@ -13,8 +13,8 @@ class Directory extends Model
     const TYPE_FILE = 1;
 
     protected $fillable = [
-        'parent_id',
         'folder_id',
+        'path',
         'name',
         'type',
         'sync_time',
@@ -32,7 +32,7 @@ class Directory extends Model
         self::where('sync_time', '<', $syncStartDate)->delete();
     }
 
-    public static function syncFilesAndFoldersFromResponse($folderId, $structure, $parentId = 0)
+    public static function syncFilesAndFoldersFromResponse($folderId, $structure, $path = '/')
     {
         $files = $folders = [];
         foreach ($structure as $name => $data) {
@@ -47,8 +47,8 @@ class Directory extends Model
             foreach ($folders as $folder) {
                 $directory = self::updateOrCreate(
                     [
-                        'parent_id' => $parentId,
                         'name'      => $folder,
+                        'path'      => $path,
                         'folder_id' => $folderId,
                         'type'      => self::TYPE_FOLDER,
                     ],
@@ -58,26 +58,49 @@ class Directory extends Model
                         'size'              => 0,
                     ]
                 );
-                self::syncFilesAndFoldersFromResponse($folderId, $structure[$folder], $directory->id);
+                self::syncFilesAndFoldersFromResponse(
+                    $folderId,
+                    $structure[$folder],
+                    self::generatePath($path, $folder)
+                );
             }
         }
         if (!empty($files)) {
             foreach ($files as $file) {
                 self::updateOrCreate(
                     [
-                        'parent_id' => $parentId,
                         'name'      => $file,
+                        'path'      => $path,
                         'folder_id' => $folderId,
                         'type'      => self::TYPE_FILE,
                     ],
                     [
-                        'sync_time'         => Carbon::now(),
                         'modification_time' => Rest::convertTime($structure[$file][0]),
+                        'sync_time'         => Carbon::now(),
                         'size'              => $structure[$file][1],
                     ]
                 );
             }
         }
+    }
+
+    public static function generatePath($basePath, $folder)
+    {
+        return rtrim($basePath, '/').'/'.$folder;
+    }
+
+    public static function generateParentPath($path = '/')
+    {
+        if (is_null($path) || '/' == $path) {
+            return '/';
+        }
+
+        $path = explode('/', $path);
+        if (2 == count($path)) {
+            return self::generateParentPath();
+        }
+
+        return implode('/', array_slice($path, 0, -1));
     }
 
     public function scopeFolders($query)
@@ -90,9 +113,9 @@ class Directory extends Model
         return $query->where('type', self::TYPE_FILE);
     }
 
-    public function scopeParent($query, $parentId)
+    public function scopePath($query, $path)
     {
-        return $query->where('parent_id', $parentId);
+        return $query->where('path', $path);
     }
 
     public function isFile()
@@ -103,5 +126,10 @@ class Directory extends Model
     public function isFolder()
     {
         return !$this->isFile();
+    }
+
+    public function getPath()
+    {
+        return self::generatePath($this->path, $this->name);
     }
 }
