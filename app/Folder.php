@@ -24,6 +24,17 @@ class Folder extends Model
         }
     }
 
+    public static function fileSize($size, $delimiter = 2)
+    {
+        $labels = 'kMGTPEZY';
+        $separator = (int)floor((strlen($size) - 1) / 3);
+
+        return sprintf(
+                "%.{$delimiter}f",
+                $size / pow(1024, $separator)
+            ).' '.($separator ? $labels[$separator - 1] : '').'B';
+    }
+
     public function directory()
     {
         return $this->hasMany(Directory::class);
@@ -34,14 +45,42 @@ class Folder extends Model
         return app(Rest::class)->getDbStatus($this->name);
     }
 
-    public static function fileSize($size, $delimiter = 2)
+    public function includeFile(Directory $file)
     {
-        $labels = 'kMGTPEZY';
-        $separator = (int)floor((strlen($size) - 1) / 3);
+        $client = app(Rest::class);
+        $ignores = $client->getIgnores($this->name);
 
-        return sprintf(
-                "%.{$delimiter}f",
-                $size / pow(1024, $separator)
-            ).' '.($separator ? $labels[$separator - 1] : '').'B';
+        if (false !== array_search('!'.$file->getPath(), $ignores)) {
+            return false;
+        }
+
+        unset($ignores[array_search('**', $ignores)]);
+        $ignores[] = '!'.$file->getPath();
+        $ignores[] = '**';
+
+        $client->postDbIgnores($this->name, $ignores);
+
+        $file->state = Directory::STATE_DOWNLOAD_IN_PROGRESS;
+        $file->save();
+
+        dd($client->getDbFile($file->folder->name, $file->name));
+
+        return true;
+    }
+
+    public function excludeFile(Directory $file)
+    {
+        $client = app(Rest::class);
+        $ignores = $client->getIgnores($this->name)['ignore'];
+
+        unset($ignores[array_search('!'.$file->getPath(), $ignores)]);
+
+        $client->postDbIgnores($this->name, $ignores);
+
+        $file->state = Directory::STATE_AVAILABLE;
+        $file->expiration_time = null;
+        $file->save();
+
+        return true;
     }
 }

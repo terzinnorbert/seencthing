@@ -14,3 +14,10 @@ body {
 .cursor {
     cursor: pointer;
 }
+
+.directory-container .progress {
+    width: 10rem;
+    float: right;
+    /* vertical-align: middle; */
+    margin-top: 0.2rem;
+}

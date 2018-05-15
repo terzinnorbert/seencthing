@@ -24,6 +24,8 @@ class CreateDirectoriesTable extends Migration
                 $table->unsignedInteger('size')->default(0);
                 $table->datetime('modification_time');
                 $table->datetime('sync_time');
+                $table->integer('state')->default(\App\Directory::STATE_AVAILABLE);
+                $table->datetime('expiration_time')->nullable();
                 $table->timestamps();
 
                 $table->foreign('folder_id')->references('id')->on('folders');

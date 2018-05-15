@@ -8,9 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Directory extends Model
 {
+    const PATH_SYNCTHING = 'share';
+
     const FOLDER_DEPTH = 5;
     const TYPE_FOLDER = 0;
     const TYPE_FILE = 1;
+
+    const STATE_AVAILABLE = 0;
+    const STATE_DOWNLOAD_IN_PROGRESS = 1;
+    const STATE_DOWNLOADED = 2;
 
     protected $fillable = [
         'folder_id',
@@ -20,6 +26,8 @@ class Directory extends Model
         'sync_time',
         'modification_time',
         'size',
+        'state',
+        'expiration_time',
     ];
 
     public static function syncFromSyncthing()
@@ -66,7 +74,9 @@ class Directory extends Model
             }
         }
         if (!empty($files)) {
+            var_dump($files);
             foreach ($files as $file) {
+                var_dump($structure[$file]);
                 self::updateOrCreate(
                     [
                         'name'      => $file,
@@ -103,6 +113,11 @@ class Directory extends Model
         return implode('/', array_slice($path, 0, -1));
     }
 
+    public function folder()
+    {
+        return $this->belongsTo('App\Folder');
+    }
+
     public function scopeFolders($query)
     {
         return $query->where('type', self::TYPE_FOLDER);
@@ -131,5 +146,28 @@ class Directory extends Model
     public function getPath()
     {
         return self::generatePath($this->path, $this->name);
+    }
+
+    public function isDownloadable()
+    {
+        $response = app(Rest::class)->getDbFile($this->folder->name, $this->name);
+
+        return false === $response['local']['invalid'];
+    }
+
+    public function getFile()
+    {
+        return response()->download($this->getStoragePath());
+    }
+
+    public function setExpiration($minutes = 15)
+    {
+        $this->expiration_time = Carbon::now()->addMinutes($minutes);
+        $this->save();
+    }
+
+    public function getStoragePath()
+    {
+        return storage_path(self::PATH_SYNCTHING).'/'.$this->folder->name.$this->getPath();
     }
 }

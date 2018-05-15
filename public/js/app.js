@@ -14102,6 +14102,8 @@
 
         __webpack_require__(12);
 
+        window.currentUrl = window.location.origin + window.location.pathname;
+
         /***/
     }),
     /* 12 */

@@ -27,21 +27,29 @@
 
                 @foreach($foldersAndFiles as $folderOrFile)
                     @php
-                        $icon = $type = 'file';
+                        $type = 'file';
+                        $icon = 'fa'.(App\Directory::STATE_AVAILABLE === $folderOrFile->state ? 'r' : 's' ).' fa-file';
                     @endphp
                     @if($folderOrFile->isFolder())
                         @php
-                            $icon = $type = 'folder';
+                            $type = 'folder';
+                            $icon = 'far fa-folder';
                         @endphp
                     @endif
 
                     <div class="list-group-item cursor" data-type="{{ $type }}"
                          data-path="{{ url()->current().'?path='.$folderOrFile->getPath() }}"
-                         data-id="{{ $folderOrFile->id }}">
+                         data-id="{{ $folderOrFile->id }}"
+                         data-state="{{ $folderOrFile->state }}">
                         <div class="row">
                             <div class="col-md-7 col-sm-10 text-truncate">
-                                <i class="fas fa-{{ $icon }}"></i>
+                                <i class="{{ $icon }}"></i>
                                 {{ $folderOrFile->name }}
+
+                                <div class="progress d-none">
+                                    <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="0"
+                                         aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
                             </div>
                             <div class="col-3 d-none d-md-block text-right text-truncate">{{ $folderOrFile->modification_time }}</div>
                             <div class="col-2 d-none d-sm-block text-right text-truncate">{{ App\Folder::fileSize($folderOrFile->size) }}</div>
