@@ -11,6 +11,13 @@ body {
     font-family: "Roboto";
 }
 
+.navbar-brand {
+    .logo {
+        @extend .mr-2;
+        width: 32px;
+    }
+}
+
 .cursor {
     cursor: pointer;
 }

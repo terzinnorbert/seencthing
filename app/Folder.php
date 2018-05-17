@@ -4,6 +4,7 @@ namespace App;
 
 use Carbon\Carbon;
 use App\Client\Rest;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 class Folder extends Model
@@ -68,19 +69,40 @@ class Folder extends Model
         return true;
     }
 
-    public function excludeFile(Directory $file)
+    /**
+     * @param Collection $files
+     * @return bool
+     */
+    public function excludeFiles(Collection $files)
     {
         $client = app(Rest::class);
-        $ignores = $client->getIgnores($this->name)['ignore'];
+        $ignores = $client->getIgnores($this->name);
 
-        unset($ignores[array_search('!'.$file->getPath(), $ignores)]);
+        foreach ($files as $file) {
+            unset($ignores[array_search('!'.$file->getPath(), $ignores)]);
+        }
 
         $client->postDbIgnores($this->name, $ignores);
 
-        $file->state = Directory::STATE_AVAILABLE;
-        $file->expiration_time = null;
-        $file->save();
+        foreach ($files as $file) {
+            $file->state = Directory::STATE_AVAILABLE;
+            $file->expiration_time = null;
+            $file->save();
+
+            unlink($file->getStoragePath());
+        }
 
         return true;
+    }
+
+    public function deleteExpiredFiles()
+    {
+        $files = $this->directory()->where('state', Directory::STATE_DOWNLOADED)->where(
+            'expiration_time',
+            '<',
+            Carbon::now()
+        )->get();
+
+        return $this->excludeFiles($files);
     }
 }

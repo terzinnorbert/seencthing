@@ -74,9 +74,7 @@ class Directory extends Model
             }
         }
         if (!empty($files)) {
-            var_dump($files);
             foreach ($files as $file) {
-                var_dump($structure[$file]);
                 self::updateOrCreate(
                     [
                         'name'      => $file,

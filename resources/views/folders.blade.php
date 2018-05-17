@@ -8,6 +8,10 @@
                     <div class="card-header">{{$folder->name}}</div>
 
                     <div class="card-body">
+                        <div class="float-right">
+                            <button class="btn btn-secondary">Refresh</button>
+                            <a href="/folders/{{$folder->id}}" class="btn btn-primary">Browse</a>
+                        </div>
                         @php
                             $info = $folder->getStatus();
                         @endphp

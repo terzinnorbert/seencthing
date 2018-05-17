@@ -3,7 +3,12 @@
 @section('content')
     <div class="row">
         <div class="col-3">
+            <div class="card">
+                <div class="card-header">{{$folder->name}}</div>
 
+                <div class="card-body">
+                </div>
+            </div>
         </div>
         <div class="col-9">
             <h5 class="mx-3">
@@ -14,7 +19,7 @@
                 </div>
             </h5>
             <div class="directory-container list-group">
-                @if ('/' !== request('path'))
+                @if ('/' !== request('path','/'))
                     <div class="list-group-item cursor" data-type="parent"
                          data-path="{{ url()->current().'?path='.App\Directory::generateParentPath(request('path'))}}">
                         <div class="row">

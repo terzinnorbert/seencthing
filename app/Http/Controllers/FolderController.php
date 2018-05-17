@@ -17,6 +17,9 @@ class FolderController extends Controller
         $this->client = app(Rest::class);
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function index()
     {
         return view('folders', ['folders' => Folder::orderBy('name')->get()]);

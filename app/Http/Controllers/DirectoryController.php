@@ -20,6 +20,11 @@ class DirectoryController extends Controller
         $this->client = app(Rest::class);
     }
 
+    /**
+     * @param Request $request
+     * @param Folder $folder
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function listing(Request $request, Folder $folder)
     {
         $path = $request->input('path', '/');
@@ -29,10 +34,18 @@ class DirectoryController extends Controller
 
         return view(
             'directory.listing',
-            ['foldersAndFiles' => $folder->directory()->path($path)->orderBy('type')->get()]
+            [
+                'folder'          => $folder,
+                'foldersAndFiles' => $folder->directory()->path($path)->orderBy('type')->get(),
+            ]
         );
     }
 
+    /**
+     * @param Folder $folder
+     * @param Directory $directory
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function markToDownload(Folder $folder, Directory $directory)
     {
         $folder->includeFile($directory);
@@ -40,6 +53,11 @@ class DirectoryController extends Controller
         return $this->success();
     }
 
+    /**
+     * @param Folder $folder
+     * @param Directory $directory
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function isDownloadable(Folder $folder, Directory $directory)
     {
         $localSize = 0;
@@ -55,6 +73,11 @@ class DirectoryController extends Controller
         );
     }
 
+    /**
+     * @param Folder $folder
+     * @param Directory $directory
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
     public function download(Folder $folder, Directory $directory)
     {
         while (!$directory->isDownloadable()) {

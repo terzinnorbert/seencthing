@@ -11,6 +11,10 @@ class Rest extends Client
         parent::__construct(env('SYNCTHING_HOST'), env('SYNCTHING_API_KEY'));
     }
 
+    /**
+     * @param string $folder
+     * @return array
+     */
     public function getIgnores($folder)
     {
         $response = $this->getDbIgnores($folder);
