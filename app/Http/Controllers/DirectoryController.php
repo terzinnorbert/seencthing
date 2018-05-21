@@ -35,6 +35,8 @@ class DirectoryController extends Controller
         return view(
             'directory.listing',
             [
+                'devices'         => $this->getFolderDevices($folder),
+                'connections'     => $this->client->getConnections(),
                 'folder'          => $folder,
                 'foldersAndFiles' => $folder->directory()->path($path)->orderBy('type')->get(),
             ]
@@ -89,5 +91,33 @@ class DirectoryController extends Controller
         $directory->save();
 
         return $directory->getFile();
+    }
+
+    /**
+     * @param Folder $folder
+     * @return array
+     */
+    protected function getFolderDevices(Folder $folder)
+    {
+        $folderName = $folder->name;
+        $config = $this->client->getSystemConfig();
+
+        $devices = [];
+        foreach ($config['devices'] as $device) {
+            $devices[$device['deviceID']] = $device;
+        }
+
+        foreach ($config['folders'] as $folder) {
+            if ($folderName == $folder['id']) {
+                return array_map(
+                    function ($device) use ($devices) {
+                        return $devices[$device['deviceID']];
+                    },
+                    $folder['devices']
+                );
+            }
+        }
+
+        return [];
     }
 }

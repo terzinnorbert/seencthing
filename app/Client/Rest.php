@@ -24,4 +24,14 @@ class Rest extends Client
 
         return $response['ignore'];
     }
+
+    /**
+     * @return array
+     */
+    public function getConnections()
+    {
+        $connections = $this->client->getSystemConnections();
+
+        return $connections['connections'];
+    }
 }

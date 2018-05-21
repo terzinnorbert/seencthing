@@ -22,6 +22,11 @@ body {
     cursor: pointer;
 }
 
+.directory-info .card-header {
+    @extend h5;
+    margin: 0;
+}
+
 .directory-container .progress {
     width: 10rem;
     float: right;

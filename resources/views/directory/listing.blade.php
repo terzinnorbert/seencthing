@@ -3,10 +3,17 @@
 @section('content')
     <div class="row">
         <div class="col-3">
-            <div class="card">
+            <div class="card directory-info">
                 <div class="card-header">{{$folder->name}}</div>
 
                 <div class="card-body">
+                    <h5>Devices</h5>
+                    <div class="list-group">
+                        @foreach($devices as $device)
+                            <div class="list-group-item">{{ $device['name'] }}
+                                - {{ $connections[$device['deviceID']]['connected'] ? 'online' : 'offline' }}</div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
