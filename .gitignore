@@ -13,3 +13,5 @@ yarn-error.log
 .env
 .mysqldata
 /.gtm/
+/storage/share
+/storage/syncthing

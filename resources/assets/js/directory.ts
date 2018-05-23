@@ -1,4 +1,4 @@
-$('.list-group-item').click((event) => {
+$('.directory-container .list-group-item').click((event) => {
     let $row = $(event.currentTarget);
 
     if ('file' == $row.data('type')) {

@@ -10,8 +10,14 @@
                     <h5>Devices</h5>
                     <div class="list-group">
                         @foreach($devices as $device)
-                            <div class="list-group-item">{{ $device['name'] }}
-                                - {{ $connections[$device['deviceID']]['connected'] ? 'online' : 'offline' }}</div>
+                            <div class="list-group-item">
+                                @if ($connections[$device['deviceID']]['connected'])
+                                    <span class="badge badge-success">online</span>
+                                @else
+                                    <span class="badge badge-danger">offline</span>
+                                @endif
+                                {{ $device['name'] }}
+                            </div>
                         @endforeach
                     </div>
                 </div>
@@ -59,7 +65,8 @@
                                 {{ $folderOrFile->name }}
 
                                 <div class="progress d-none">
-                                    <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="0"
+                                    <div class="progress-bar progress-bar-striped" role="progressbar"
+                                         aria-valuenow="0"
                                          aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
                             </div>

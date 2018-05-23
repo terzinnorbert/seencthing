@@ -96,6 +96,7 @@ h2,
 h3,
 h4,
 h5,
+.directory-info .card-header,
 h6 {
   margin-top: 0;
   margin-bottom: 0.5rem;
@@ -382,6 +383,7 @@ h2,
 h3,
 h4,
 h5,
+.directory-info .card-header,
 h6,
 .h1,
 .h2,
@@ -417,6 +419,7 @@ h4,
 }
 
 h5,
+.directory-info .card-header,
 .h5 {
   font-size: 1.125rem;
 }
@@ -8580,6 +8583,7 @@ button.bg-dark:focus {
 }
 
 .mr-2,
+.navbar-brand .logo,
 .mx-2 {
   margin-right: 0.5rem !important;
 }
@@ -10416,8 +10420,16 @@ body {
   font-family: "Roboto";
 }
 
+.navbar-brand .logo {
+    width: 32px;
+}
+
 .cursor {
   cursor: pointer;
+}
+
+.directory-info .card-header {
+    margin: 0;
 }
 
 .directory-container .progress {

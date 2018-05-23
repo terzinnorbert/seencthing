@@ -37,7 +37,12 @@ class RegisterController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest');
+        // Disable user registration after the first one
+        if (!User::count()) {
+            $this->middleware('guest');
+        } else {
+            $this->middleware('auth');
+        }
     }
 
     /**

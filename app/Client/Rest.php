@@ -30,7 +30,7 @@ class Rest extends Client
      */
     public function getConnections()
     {
-        $connections = $this->client->getSystemConnections();
+        $connections = $this->getSystemConnections();
 
         return $connections['connections'];
     }
