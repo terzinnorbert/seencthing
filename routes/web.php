@@ -15,7 +15,7 @@ Route::get(
     '/',
     function () {
         if (!Auth::user()) {
-            return redirect('/home');
+            return redirect('/login');
         }
 
         return redirect('/folders');
@@ -35,7 +35,6 @@ Route::get(
 Route::group(
     ['middleware' => ['auth']],
     function () {
-        Route::get('/home', 'HomeController@index')->name('home');
         Route::get('/folders', 'FolderController@index')->name('folders');
         Route::get('/folders/{folder}', 'DirectoryController@listing')->name('files');
         Route::post('/folders/{folder}/directory/{directory}/download', 'DirectoryController@markToDownload');

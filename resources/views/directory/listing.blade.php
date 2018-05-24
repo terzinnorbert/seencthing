@@ -10,14 +10,16 @@
                     <h5>Devices</h5>
                     <div class="list-group">
                         @foreach($devices as $device)
-                            <div class="list-group-item">
-                                @if ($connections[$device['deviceID']]['connected'])
-                                    <span class="badge badge-success">online</span>
-                                @else
-                                    <span class="badge badge-danger">offline</span>
-                                @endif
-                                {{ $device['name'] }}
-                            </div>
+                            @if (array_key_exists($device['deviceID'],$connections))
+                                <div class="list-group-item">
+                                    @if ($connections[$device['deviceID']]['connected'])
+                                        <span class="badge badge-success">online</span>
+                                    @else
+                                        <span class="badge badge-danger">offline</span>
+                                    @endif
+                                    {{ $device['name'] }}
+                                </div>
+                            @endif
                         @endforeach
                     </div>
                 </div>

@@ -32,6 +32,12 @@ class Rest extends Client
     {
         $connections = $this->getSystemConnections();
 
+        $status = $this->getSystemStatus();
+
+        if (array_key_exists($status['myID'], $connections['connections'])) {
+            unset($connections['connections'][$status['myID']]);
+        }
+
         return $connections['connections'];
     }
 }
