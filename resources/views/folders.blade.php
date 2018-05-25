@@ -9,7 +9,7 @@
 
                     <div class="card-body">
                         <div class="float-right">
-                            <button class="btn btn-secondary">Refresh</button>
+                            <a href="/folders/{{$folder->id}}/refresh" class="btn btn-secondary">Refresh</a>
                             <a href="/folders/{{$folder->id}}" class="btn btn-primary">Browse</a>
                         </div>
                         @php

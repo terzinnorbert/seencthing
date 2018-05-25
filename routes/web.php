@@ -36,6 +36,7 @@ Route::group(
     ['middleware' => ['auth']],
     function () {
         Route::get('/folders', 'FolderController@index')->name('folders');
+        Route::get('/folders/{folder}/refresh', 'FolderController@refresh');
         Route::get('/folders/{folder}', 'DirectoryController@listing')->name('files');
         Route::post('/folders/{folder}/directory/{directory}/download', 'DirectoryController@markToDownload');
         Route::get('/folders/{folder}/directory/{directory}/download', 'DirectoryController@download');

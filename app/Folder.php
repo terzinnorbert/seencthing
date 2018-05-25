@@ -25,6 +25,11 @@ class Folder extends Model
         }
     }
 
+    /**
+     * @param $size
+     * @param int $delimiter
+     * @return string
+     */
     public static function fileSize($size, $delimiter = 2)
     {
         $labels = 'kMGTPEZY';
@@ -36,16 +41,26 @@ class Folder extends Model
             ).' '.($separator ? $labels[$separator - 1] : '').'B';
     }
 
+    /**
+     * @return Directory[]|\Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function directory()
     {
         return $this->hasMany(Directory::class);
     }
 
+    /**
+     * @return array
+     */
     public function getStatus()
     {
         return app(Rest::class)->getDbStatus($this->name);
     }
 
+    /**
+     * @param Directory $file
+     * @return bool
+     */
     public function includeFile(Directory $file)
     {
         $client = app(Rest::class);
@@ -95,6 +110,9 @@ class Folder extends Model
         return true;
     }
 
+    /**
+     * @return bool
+     */
     public function deleteExpiredFiles()
     {
         $files = $this->directory()->where('state', Directory::STATE_DOWNLOADED)->where(
@@ -104,5 +122,13 @@ class Folder extends Model
         )->get();
 
         return $this->excludeFiles($files);
+    }
+
+    public function syncDirectoryFromSyncthing()
+    {
+        $syncStartDate = Carbon::now();
+        $structure = app(Rest::class)->getDbBrowse($this->name, Directory::FOLDER_DEPTH);
+        Directory::syncFilesAndFoldersFromResponse($this->id, $structure);
+        Directory::where('sync_time', '<', $syncStartDate)->where('folder_id', $this->id)->delete();
     }
 }

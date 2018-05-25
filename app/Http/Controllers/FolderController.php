@@ -24,4 +24,16 @@ class FolderController extends Controller
     {
         return view('folders', ['folders' => Folder::orderBy('name')->get()]);
     }
+
+    /**
+     * @param Folder $folder
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function refresh(Folder $folder)
+    {
+        $folder->deleteExpiredFiles();
+        $folder->syncDirectoryFromSyncthing();
+
+        return redirect('/folders');
+    }
 }
