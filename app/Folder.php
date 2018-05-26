@@ -13,6 +13,7 @@ class Folder extends Model
 
     public static function syncFromSyncthing()
     {
+        $syncStartDate = Carbon::now();
         $folders = app(Rest::class)->getStatsFolder();
         foreach ($folders as $name => $data) {
             self::updateOrCreate(
@@ -23,6 +24,7 @@ class Folder extends Model
                 ]
             );
         }
+        Folder::where('sync_time', '<', $syncStartDate)->delete();
     }
 
     /**

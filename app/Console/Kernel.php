@@ -24,8 +24,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $schedule->command('syncthing:sync:folders')->everyTenMinutes();
+        $schedule->command('syncthing:sync:directories')->everyTenMinutes();
+        $schedule->command('syncthing:delete-expired-files')->everyTenMinutes();
     }
 
     /**

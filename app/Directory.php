@@ -32,9 +32,11 @@ class Directory extends Model
 
     public static function syncFromSyncthing()
     {
+        $syncStartDate = Carbon::now();
         foreach (Folder::all() as $folder) {
             $folder->syncDirectoryFromSyncthing();
         }
+        Directory::where('sync_time', '<', $syncStartDate)->delete();
     }
 
     /**
