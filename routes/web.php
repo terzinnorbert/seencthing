@@ -35,6 +35,8 @@ Route::get(
 Route::group(
     ['middleware' => ['auth']],
     function () {
+        Route::get('/devices', 'DeviceController@index')->name('devices');
+        Route::post('/devices', 'DeviceController@add');
         Route::get('/folders', 'FolderController@index')->name('folders');
         Route::get('/folders/{folder}/refresh', 'FolderController@refresh');
         Route::get('/folders/{folder}', 'DirectoryController@listing')->name('files');

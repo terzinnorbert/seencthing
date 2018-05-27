@@ -13,30 +13,13 @@
 <body>
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
     <a class="navbar-brand" href="/"><img src="{{ asset('logo.png') }}" class="logo"> {{ config('app.name') }}</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
-            aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar"
+            aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-        <ul class="navbar-nav mr-auto">
-            @if (Auth::user())
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('folders') }}">Folders</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="http://example.com" id="files-dropdown"
-                       data-toggle="dropdown"
-                       aria-haspopup="true" aria-expanded="false">Browse</a>
-                    <div class="dropdown-menu" aria-labelledby="files-dropdown">
-                        @foreach(App\Folder::all() as $folder)
-                            <a class="dropdown-item"
-                               href="{{ route('files',['folder' => $folder->id ]) }}">{{ $folder->name }}</a>
-                        @endforeach
-                    </div>
-                </li>
-            @endif
-        </ul>
+    <div class="collapse navbar-collapse" id="navbar">
+        @include('layouts.navbar')
         @if (Auth::user())
             <a href="/logout" class="btn btn-warning btn-outline-warning">Logout</a>
         @endif

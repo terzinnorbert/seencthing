@@ -22,7 +22,7 @@ class FolderController extends Controller
      */
     public function index()
     {
-        return view('folders', ['folders' => Folder::orderBy('name')->get()]);
+        return view('folder/folders', ['folders' => Folder::orderBy('name')->get()]);
     }
 
     /**

@@ -100,14 +100,9 @@ class DirectoryController extends Controller
     protected function getFolderDevices(Folder $folder)
     {
         $folderName = $folder->name;
-        $config = $this->client->getSystemConfig();
+        $devices = $this->client->getDevices();
 
-        $devices = [];
-        foreach ($config['devices'] as $device) {
-            $devices[$device['deviceID']] = $device;
-        }
-
-        foreach ($config['folders'] as $folder) {
+        foreach ($this->client->getFolders() as $folder) {
             if ($folderName == $folder['id']) {
                 return array_map(
                     function ($device) use ($devices) {

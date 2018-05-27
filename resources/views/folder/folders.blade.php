@@ -4,7 +4,7 @@
     <div class="row justify-content-center">
         @foreach($folders as $folder)
             <div class="col-md-8">
-                <div class="card">
+                <div class="card mb-2">
                     <div class="card-header">{{$folder->name}}</div>
 
                     <div class="card-body">
@@ -16,14 +16,14 @@
                             $info = $folder->getStatus();
                         @endphp
                         <div class="mb-1">
-                            <i class="far fa-file"></i> Files: {{ $info['globalFiles'] }}</div>
+                            <i class="fas fa-file"></i> Files: {{ $info['globalFiles'] }}</div>
                         <div class="mb-1">
-                            <i class="far fa-folder"></i> Folders: {{ $info['globalDirectories'] }}<br></div>
+                            <i class="fas fa-folder"></i> Folders: {{ $info['globalDirectories'] }}<br></div>
                         <div class="mb-1">
-                            <i class="far fa-hdd"></i> Size: {{ App\Folder::fileSize($info['globalBytes']) }}<br>
+                            <i class="fas fa-hdd"></i> Size: {{ App\Folder::fileSize($info['globalBytes']) }}<br>
                         </div>
                         <div class="mb-1">
-                            <i class="far fa-clock"></i> Last
+                            <i class="fas fa-clock"></i> Last
                             scan: {{ App\Client\Rest::convertTime($info['stateChanged']) }}<br></div>
                     </div>
                 </div>
