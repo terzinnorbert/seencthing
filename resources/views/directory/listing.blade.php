@@ -4,7 +4,7 @@
     <div class="row">
         <div class="col-3">
             <div class="card directory-info">
-                <div class="card-header">{{$folder->name}}</div>
+                <div class="card-header">{{ $folder->label }}</div>
 
                 <div class="card-body">
                     <h5>Devices</h5>

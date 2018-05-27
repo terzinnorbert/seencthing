@@ -2,6 +2,7 @@
 
 namespace App\Client;
 
+use App\Directory;
 use SyncthingRest\Client;
 
 class Rest extends Client
@@ -78,16 +79,59 @@ class Rest extends Client
     {
         $config = $this->getSystemConfig();
         $config['devices'][] = [
-            "deviceID"      => $deviceId,
-            "_addressesStr" => "dynamic",
-            "compression"   => "metadata",
-            "introducer"    => true,
-            "addresses"     => [
-                "dynamic",
+            'deviceID'      => $deviceId,
+            '_addressesStr' => 'dynamic',
+            'compression'   => 'metadata',
+            'introducer'    => true,
+            'addresses'     => [
+                'dynamic',
             ],
         ];
 
         $this->postSystemConfig($config);
+
+        return $this->getSystemConfigInsync();
+    }
+
+    /**
+     * @param $id
+     * @param $label
+     * @param $device
+     * @return array
+     */
+    public function addFolder($id, $label, $device)
+    {
+        $config = $this->getSystemConfig();
+        $config['folders'][] = [
+            'type'                   => 'readwrite',
+            'rescanIntervalS'        => 3600,
+            'fsWatcherDelayS'        => 10,
+            'fsWatcherEnabled'       => true,
+            'minDiskFree'            => [
+                'value' => 1,
+                'unit'  => '%',
+            ],
+            'maxConflicts'           => 10,
+            'fsync'                  => true,
+            'order'                  => 'random',
+            'fileVersioningSelector' => 'none',
+            'trashcanClean'          => 0,
+            'simpleKeep'             => 5,
+            'staggeredMaxAge'        => 365,
+            'staggeredCleanInterval' => 3600,
+            'staggeredVersionsPath'  => '',
+            'externalCommand'        => '',
+            'autoNormalize'          => true,
+            'path'                   => storage_path(Directory::PATH_SYNCTHING).'/'.$id,
+            'id'                     => $id,
+            'label'                  => $label,
+            'devices'                => [
+                ['deviceID' => $device],
+            ],
+        ];
+
+        $this->postSystemConfig($config);
+        $this->postDbIgnores($id, ['**']);
 
         return $this->getSystemConfigInsync();
     }
@@ -120,5 +164,18 @@ class Rest extends Client
         }
 
         return $folders;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFoldersNames()
+    {
+        return array_map(
+            function ($data) {
+                return $data['label'];
+            },
+            $this->getFolders()
+        );
     }
 }

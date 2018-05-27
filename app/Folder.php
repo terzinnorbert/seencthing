@@ -9,15 +9,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Folder extends Model
 {
-    protected $fillable = ['name', 'scan_time', 'sync_time'];
+    protected $fillable = ['name', 'label', 'scan_time', 'sync_time'];
 
     public static function syncFromSyncthing()
     {
         $syncStartDate = Carbon::now();
-        $folders = app(Rest::class)->getStatsFolder();
+        $client = app(Rest::class);
+        $names = $client->getFoldersNames();
+        $folders = $client->getStatsFolder();
+
         foreach ($folders as $name => $data) {
             self::updateOrCreate(
-                ['name' => $name],
+                ['name' => $name, 'label' => $names[$name]],
                 [
                     'scan_time' => Rest::convertTime($data['lastScan']),
                     'sync_time' => Carbon::now(),
@@ -41,6 +44,22 @@ class Folder extends Model
                 "%.{$delimiter}f",
                 $size / pow(1024, $separator)
             ).' '.($separator ? $labels[$separator - 1] : '').'B';
+    }
+
+    /**
+     * @return Folder[]
+     */
+    public static function getFolders()
+    {
+        $client = app(Rest::class);
+        $names = $client->getFoldersNames();
+        $folders = [];
+        foreach (Folder::orderBy('name')->get() as $folder) {
+            $folder->label = $names[$folder->name];
+            $folders[$folder->name] = $folder;
+        }
+
+        return $folders;
     }
 
     /**

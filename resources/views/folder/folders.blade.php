@@ -5,12 +5,12 @@
         @foreach($folders as $folder)
             <div class="col-md-8">
                 <div class="card mb-2">
-                    <div class="card-header">{{$folder->name}}</div>
+                    <div class="card-header">{{ $folder->label }} - {{ $folder->name }}</div>
 
                     <div class="card-body">
                         <div class="float-right">
-                            <a href="/folders/{{$folder->id}}/refresh" class="btn btn-secondary">Refresh</a>
-                            <a href="/folders/{{$folder->id}}" class="btn btn-primary">Browse</a>
+                            <a href="/folders/{{ $folder->id }}/refresh" class="btn btn-secondary">Refresh</a>
+                            <a href="/folders/{{ $folder->id }}" class="btn btn-primary">Browse</a>
                         </div>
                         @php
                             $info = $folder->getStatus();

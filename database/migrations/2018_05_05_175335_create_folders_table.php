@@ -18,6 +18,7 @@ class CreateFoldersTable extends Migration
             function (Blueprint $table) {
                 $table->increments('id');
                 $table->string('name');
+                $table->string('label');
                 $table->dateTime('scan_time');
                 $table->dateTime('sync_time');
                 $table->timestamps();

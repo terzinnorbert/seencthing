@@ -14,9 +14,9 @@
                data-toggle="dropdown" href="#"
                aria-haspopup="true" aria-expanded="false">Browse</a>
             <div class="dropdown-menu" aria-labelledby="files-dropdown">
-                @foreach(App\Folder::all() as $folder)
+                @foreach(App\Folder::orderBy('label')->get() as $folder)
                     <a class="dropdown-item"
-                       href="{{ route('files',['folder' => $folder->id ]) }}">{{ $folder->name }}</a>
+                       href="{{ route('files',['folder' => $folder->id ]) }}">{{ $folder->label }}</a>
                 @endforeach
             </div>
         </li>
