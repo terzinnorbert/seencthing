@@ -39,6 +39,10 @@ class StartSyncthing extends Command
      */
     public function handle()
     {
-        system(self::SYNCTHING.' -no-browser -home='.self::PATH);
+        system(
+            self::SYNCTHING.' -no-browser -gui-address="'.config('syncthing.host').'" -gui-apikey="'.config(
+                'syncthing.key'
+            ).'" -home='.self::PATH
+        );
     }
 }
