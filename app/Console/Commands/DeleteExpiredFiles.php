@@ -3,9 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Folder;
-use Illuminate\Console\Command;
 
-class DeleteExpiredFiles extends Command
+class DeleteExpiredFiles extends SyncthingCommand
 {
     /**
      * The name and signature of the console command.

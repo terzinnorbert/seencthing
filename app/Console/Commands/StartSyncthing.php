@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 class StartSyncthing extends Command
 {
     const SYNCTHING = 'syncthing';
-    const PATH = 'storage/syncthing';
+    const PATH = 'syncthing';
     /**
      * The name and signature of the console command.
      *
@@ -39,10 +39,15 @@ class StartSyncthing extends Command
      */
     public function handle()
     {
+        if (false === config('syncthing.host', false)) {
+            $this->error('Missing SYNCTHING_API_KEY: run php artisan syncthing:key:generate');
+            exit(1);
+        }
+
         system(
             self::SYNCTHING.' -no-browser -gui-address="'.config('syncthing.host').'" -gui-apikey="'.config(
                 'syncthing.key'
-            ).'" -home='.self::PATH
+            ).'" -home='.storage_path(self::PATH)
         );
     }
 }

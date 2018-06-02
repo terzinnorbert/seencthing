@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Folder;
 use Illuminate\Console\Command;
 
-class SyncFolders extends Command
+class SyncFolders extends SyncthingCommand
 {
     /**
      * The name and signature of the console command.

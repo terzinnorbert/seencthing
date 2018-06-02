@@ -24,9 +24,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('syncthing:sync:folders')->everyTenMinutes();
-        $schedule->command('syncthing:sync:directories')->everyTenMinutes();
-        $schedule->command('syncthing:delete-expired-files')->everyTenMinutes();
+        $schedule->command('syncthing:sync:folders')->cron('*/'.config('syncthing.cron.folders', 5).' * * * *');
+        $schedule->command('syncthing:sync:directories')->cron('*/'.config('syncthing.cron.directories', 5).' * * * *');
+        $schedule->command('syncthing:delete-expired-files')->cron(
+            '*/'.config('syncthing.cron.expiration', 5).' * * * *'
+        );
     }
 
     /**

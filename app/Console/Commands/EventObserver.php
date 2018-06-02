@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Client\Process;
 use App\Client\Rest;
 use App\Events\FolderRejected;
 use Carbon\Carbon;
@@ -48,6 +49,10 @@ class EventObserver extends Command
         $startTime = Carbon::now();
         $maxId = 0;
         while (true) {
+            if (!Process::isRunning()) {
+                sleep(60);
+                continue;
+            }
             $events = $this->client->getEvents($maxId);
             if (count($events)) {
                 foreach ($events as $event) {
