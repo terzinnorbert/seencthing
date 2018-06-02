@@ -44,7 +44,7 @@ class StartSyncthing extends Command
             exit(1);
         }
 
-        system(
+        passthru(
             self::SYNCTHING.' -no-browser -gui-address="'.config('syncthing.host').'" -gui-apikey="'.config(
                 'syncthing.key'
             ).'" -home='.storage_path(self::PATH)

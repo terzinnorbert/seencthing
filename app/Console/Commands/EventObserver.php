@@ -7,6 +7,7 @@ use App\Client\Rest;
 use App\Events\FolderRejected;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use GuzzleHttp\Exception\RequestException;
 
 class EventObserver extends Command
 {
@@ -53,7 +54,14 @@ class EventObserver extends Command
                 sleep(60);
                 continue;
             }
-            $events = $this->client->getEvents($maxId);
+
+            try {
+                $events = $this->client->getEvents($maxId);
+            } catch (RequestException $e) {
+                sleep(60);
+                continue;
+            }
+
             if (count($events)) {
                 foreach ($events as $event) {
                     if ($startTime <= Rest::convertTime($event['time'])) {

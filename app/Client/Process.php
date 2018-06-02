@@ -6,6 +6,6 @@ class Process
 {
     public static function isRunning()
     {
-        return !empty(exec('ps aux | grep "syncthing -no-browser" | grep -v grep'));
+        return !empty(exec('ps aux | grep -v grep | grep "syncthing -no"'));
     }
 }
