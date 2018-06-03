@@ -189,12 +189,12 @@ class Directory extends Model
      */
     public function isDownloadable()
     {
-        $response = app(Rest::class)->getDbFile($this->folder->name, $this->name);
+        $response = app(Rest::class)->getDbFile($this->folder->name, trim($this->getPath(), '/'));
 
         return false === $response['local']['invalid'];
     }
 
-    /**
+    /**'
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function getFile()
