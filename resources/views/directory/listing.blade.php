@@ -2,10 +2,9 @@
 
 @section('content')
     <div class="row">
-        <div class="col-3">
+        <div class="col-3 d-none d-lg-block">
             <div class="card directory-info">
                 <div class="card-header">{{ $folder->label }}</div>
-
                 <div class="card-body">
                     <h5>Devices</h5>
                     <div class="list-group">
@@ -25,7 +24,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-9">
+        <div class="col-12 col-lg-9">
             <h5 class="mx-3">
                 <div class="row">
                     <div class="col-md-7 col-sm-10">Name</div>
