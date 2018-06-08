@@ -62,17 +62,26 @@
                          data-state="{{ $folderOrFile->state }}">
                         <div class="row">
                             <div class="col-md-7 col-sm-10 text-truncate">
-                                <i class="{{ $icon }}"></i>
-                                {{ $folderOrFile->name }}
-
-                                <div class="progress d-none">
-                                    <div class="progress-bar progress-bar-striped" role="progressbar"
-                                         aria-valuenow="0"
-                                         aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="row">
+                                    <div class="col text-truncate">
+                                        <i class="icon {{ $icon }}"></i>
+                                        {{ $folderOrFile->name }}
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="progress d-none">
+                                            <div class="progress-bar progress-bar-striped" role="progressbar"
+                                                 aria-valuenow="0"
+                                                 aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-3 d-none d-md-block text-right text-truncate">{{ $folderOrFile->modification_time }}</div>
-                            <div class="col-2 d-none d-sm-block text-right text-truncate">{{ App\Folder::fileSize($folderOrFile->size) }}</div>
+                            <div class="col-2 d-none d-sm-block text-right text-truncate">
+                                @if($folderOrFile->isFile())
+                                    {{ App\Folder::fileSize($folderOrFile->size) }}
+                                @endif
+                            </div>
                         </div>
                     </div>
                 @endforeach

@@ -28,7 +28,8 @@ class CreateDirectoriesTable extends Migration
                 $table->datetime('expiration_time')->nullable();
                 $table->timestamps();
 
-                $table->foreign('folder_id')->references('id')->on('folders');
+                $table->foreign('folder_id')->references('id')->on('folders')
+                    ->onDelete('cascade');
             }
         );
     }

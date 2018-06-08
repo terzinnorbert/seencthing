@@ -100,8 +100,6 @@ class Folder extends Model
         $file->state = Directory::STATE_DOWNLOAD_IN_PROGRESS;
         $file->save();
 
-        dd($client->getDbFile($file->folder->name, $file->name));
-
         return true;
     }
 
