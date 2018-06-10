@@ -43,5 +43,17 @@ Route::group(
         Route::post('/folders/{folder}/directory/{directory}/download', 'DirectoryController@markToDownload');
         Route::get('/folders/{folder}/directory/{directory}/download', 'DirectoryController@download');
         Route::get('/folders/{folder}/directory/{directory}/state', 'DirectoryController@isDownloadable');
+        Route::get('/folders/{folder}/directory/{directory}/share', 'DirectoryController@getShareUrl');
     }
 );
+
+Route::get(
+    '/share',
+    function () {
+        return redirect('/');
+    }
+);
+Route::get('/share/{hash}', 'ShareController@index');
+Route::get('/share/{hash}/download', 'ShareController@download');
+Route::post('/share/{hash}/download', 'ShareController@markToDownload');
+Route::get('/share/{hash}/progress', 'ShareController@progress');

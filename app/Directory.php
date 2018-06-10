@@ -28,6 +28,7 @@ class Directory extends Model
         'size',
         'state',
         'expiration_time',
+        'hash',
     ];
 
     public static function syncFromSyncthing()
@@ -184,6 +185,11 @@ class Directory extends Model
         return self::generatePath($this->path, $this->name);
     }
 
+    public function markToDownload()
+    {
+        return $this->folder->includeFile($this);
+    }
+
     /**
      * @return bool
      */
@@ -192,6 +198,29 @@ class Directory extends Model
         $response = app(Rest::class)->getDbFile($this->folder->name, trim($this->getPath(), '/'));
 
         return false === $response['local']['invalid'];
+    }
+
+    public function progress()
+    {
+        $localSize = 0;
+        if (file_exists($this->getStoragePath())) {
+            $localSize = filesize($this->getStoragePath());
+        }
+
+        return number_format($localSize / (int)$this->size, 0) * 100;
+    }
+
+    public function download()
+    {
+        while (!$this->isDownloadable()) {
+            sleep(2);
+        }
+
+        $this->state = Directory::STATE_DOWNLOADED;
+        $this->expiration_time = Carbon::now()->addMinutes(15);
+        $this->save();
+
+        return $this->getFile();
     }
 
     /**'
@@ -217,5 +246,24 @@ class Directory extends Model
     public function getStoragePath()
     {
         return storage_path(self::PATH_SYNCTHING).'/'.$this->folder->name.$this->getPath();
+    }
+
+    public function getShareUrl()
+    {
+        if (empty($this->hash)) {
+            $this->generateHash();
+        }
+
+        return url('share/'.$this->hash);
+    }
+
+    protected function generateHash()
+    {
+        do {
+            $hash = str_random(64);
+        } while (Directory::where('hash', $hash)->get()->count());
+
+        $this->hash = $hash;
+        $this->save();
     }
 }

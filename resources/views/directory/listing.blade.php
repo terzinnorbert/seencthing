@@ -8,17 +8,11 @@
                 <div class="card-body">
                     <h5>Devices</h5>
                     <div class="list-group">
-                        @foreach($devices as $device)
-                            @if (array_key_exists($device['deviceID'],$connections))
-                                <div class="list-group-item">
-                                    @if ($connections[$device['deviceID']]['connected'])
-                                        <span class="badge badge-success">online</span>
-                                    @else
-                                        <span class="badge badge-danger">offline</span>
-                                    @endif
-                                    {{ $device['name'] }}
-                                </div>
-                            @endif
+                        @foreach($folder->getDevices() as $device)
+                            <div class="list-group-item">
+                                <span class="badge badge-{{ 'online' == $device['state'] ? 'success' : 'danger' }}">{{ $device['state'] }}</span>
+                                {{ $device['name'] }}
+                            </div>
                         @endforeach
                     </div>
                 </div>
@@ -74,6 +68,11 @@
                                                  aria-valuemin="0" aria-valuemax="100"></div>
                                         </div>
                                     </div>
+                                    @if($folderOrFile->isFile())
+                                        <div class="col-auto share-container">
+                                            <i class="fa{{ !empty($folderOrFile->hash) ? 's' : 'r' }} fa-share-square share"></i>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                             <div class="col-3 d-none d-md-block text-right text-truncate">{{ $folderOrFile->modification_time }}</div>
@@ -85,6 +84,30 @@
                         </div>
                     </div>
                 @endforeach
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="share-modal" tabindex="-1" role="dialog" aria-labelledby="share-modal-label"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="share-modal-label">Share file</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="share-modal-url">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="share-modal-copy">Copy</button>
+                        </div>
+                    </div>
+                    <div id="share-modal-info" class="d-none mt-1">
+                        Copied to clipboard
+                    </div>
+                </div>
             </div>
         </div>
     </div>

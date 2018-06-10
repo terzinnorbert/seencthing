@@ -178,4 +178,26 @@ class Rest extends Client
             $this->getFolders()
         );
     }
+
+    /**
+     * @param $folderId
+     * @return array
+     */
+    public function getFolderDevices($folderId)
+    {
+        $devices = $this->getDevices();
+
+        foreach ($this->getFolders() as $folder) {
+            if ($folderId == $folder['id']) {
+                return array_map(
+                    function ($device) use ($devices) {
+                        return $devices[$device['deviceID']];
+                    },
+                    $folder['devices']
+                );
+            }
+        }
+
+        return [];
+    }
 }

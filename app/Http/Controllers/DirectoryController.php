@@ -35,8 +35,6 @@ class DirectoryController extends Controller
         return view(
             'directory.listing',
             [
-                'devices'         => $this->getFolderDevices($folder),
-                'connections'     => $this->client->getConnections(),
                 'folder'          => $folder,
                 'foldersAndFiles' => $folder->directory()->path($path)->orderBy('type')->get(),
             ]
@@ -50,7 +48,7 @@ class DirectoryController extends Controller
      */
     public function markToDownload(Folder $folder, Directory $directory)
     {
-        $folder->includeFile($directory);
+        $directory->markToDownload();
 
         return $this->success();
     }
@@ -62,15 +60,10 @@ class DirectoryController extends Controller
      */
     public function isDownloadable(Folder $folder, Directory $directory)
     {
-        $localSize = 0;
-        if (file_exists($directory->getStoragePath())) {
-            $localSize = filesize($directory->getStoragePath());
-        }
-
         return $this->success(
             [
                 'downloadable' => $directory->isDownloadable(),
-                'progress'     => number_format($localSize / (int)$directory->size, 0) * 100,
+                'progress'     => $directory->progress(),
             ]
         );
     }
@@ -82,37 +75,16 @@ class DirectoryController extends Controller
      */
     public function download(Folder $folder, Directory $directory)
     {
-        while (!$directory->isDownloadable()) {
-            sleep(2);
-        }
-
-        $directory->state = Directory::STATE_DOWNLOADED;
-        $directory->expiration_time = Carbon::now()->addMinutes(15);
-        $directory->save();
-
-        return $directory->getFile();
+        return $directory->download();
     }
 
     /**
      * @param Folder $folder
-     * @return array
+     * @param Directory $directory
+     * @return \Illuminate\Http\JsonResponse
      */
-    protected function getFolderDevices(Folder $folder)
+    public function getShareUrl(Folder $folder, Directory $directory)
     {
-        $folderName = $folder->name;
-        $devices = $this->client->getDevices();
-
-        foreach ($this->client->getFolders() as $folder) {
-            if ($folderName == $folder['id']) {
-                return array_map(
-                    function ($device) use ($devices) {
-                        return $devices[$device['deviceID']];
-                    },
-                    $folder['devices']
-                );
-            }
-        }
-
-        return [];
+        return $this->success(['url' => $directory->getShareUrl()]);
     }
 }

@@ -150,4 +150,25 @@ class Folder extends Model
         Directory::syncFilesAndFoldersFromResponse($this->id, $structure);
         Directory::where('sync_time', '<', $syncStartDate)->where('folder_id', $this->id)->delete();
     }
+
+    public function getDevices()
+    {
+        /**
+         * @var Rest $client
+         */
+        $client = app(Rest::class);
+        $devices = [];
+        $connections = $client->getConnections();
+        foreach ($client->getFolderDevices($this->name) as $device) {
+            if (array_key_exists($device['deviceID'], $connections)) {
+                $devices[$device['deviceID']] = [
+                    'name'  => $device['name'],
+                    'id'    => $device['deviceID'],
+                    'state' => $connections[$device['deviceID']]['connected'] ? 'online' : 'offline',
+                ];
+            }
+        }
+
+        return $devices;
+    }
 }
