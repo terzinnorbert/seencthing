@@ -1,3 +1,5 @@
+import notify from './notify.ts';
+
 const ignoreDownload = ['share', 'share-container'];
 
 $('.directory-container .share').click((event) => {
@@ -32,12 +34,13 @@ $('.directory-container .list-group-item').click((event) => {
     if ('file' == $row.data('type')) {
         let downloadUrl = currentUrl + '/directory/' + $row.data('id') + '/download';
 
-        if (2 == $row.data('state')) {
-            downloadFile(downloadUrl);
-            return;
-        }
-
         axios.post(downloadUrl).then((response) => {
+
+            if (!response.data.success) {
+                notify.danger($row.find('.col-name').text() + '<hr>' + response.data.error);
+                return;
+            }
+
             $row.find('.progress').removeClass('d-none');
             $row.find('.progress-bar').removeClass('d-none').css('width', '1%');
             let downloadSate = setInterval(() => {

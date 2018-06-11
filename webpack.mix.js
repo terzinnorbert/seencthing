@@ -13,6 +13,7 @@ let mix = require('laravel-mix');
 mix.js('resources/assets/js/app.js', 'public/js')
     .js('resources/assets/js/directory.ts', 'public/js')
     .js('resources/assets/js/share.ts', 'public/js')
+    .js('resources/assets/js/notify.ts', 'public/js')
     .js('resources/assets/js/devices.ts', 'public/js')
     .sass('resources/assets/sass/app.scss', 'public/css')
     .autoload({

@@ -33,3 +33,10 @@ body {
     /* vertical-align: middle; */
     margin-top: 0.2rem;
 }
+
+#notify-bar {
+    width: 400px;
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+}

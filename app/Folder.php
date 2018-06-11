@@ -151,6 +151,9 @@ class Folder extends Model
         Directory::where('sync_time', '<', $syncStartDate)->where('folder_id', $this->id)->delete();
     }
 
+    /**
+     * @return array
+     */
     public function getDevices()
     {
         /**
@@ -170,5 +173,26 @@ class Folder extends Model
         }
 
         return $devices;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOnlineDevices()
+    {
+        return array_filter(
+            $this->getDevices(),
+            function ($device) {
+                return 'online' == $device['state'];
+            }
+        );
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasOnlineDevice()
+    {
+        return !!count($this->getOnlineDevices());
     }
 }

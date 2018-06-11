@@ -40,9 +40,14 @@ Route::group(
         Route::get('/folders', 'FolderController@index')->name('folders');
         Route::get('/folders/{folder}/refresh', 'FolderController@refresh');
         Route::get('/folders/{folder}', 'DirectoryController@listing')->name('files');
-        Route::post('/folders/{folder}/directory/{directory}/download', 'DirectoryController@markToDownload');
-        Route::get('/folders/{folder}/directory/{directory}/download', 'DirectoryController@download');
-        Route::get('/folders/{folder}/directory/{directory}/state', 'DirectoryController@isDownloadable');
+        Route::group(
+            ['middleware' => [\App\Http\Middleware\HasOnlineDevice::class]],
+            function () {
+                Route::post('/folders/{folder}/directory/{directory}/download', 'DirectoryController@markToDownload');
+                Route::get('/folders/{folder}/directory/{directory}/download', 'DirectoryController@download');
+                Route::get('/folders/{folder}/directory/{directory}/state', 'DirectoryController@isDownloadable');
+            }
+        );
         Route::get('/folders/{folder}/directory/{directory}/share', 'DirectoryController@getShareUrl');
     }
 );

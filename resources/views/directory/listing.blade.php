@@ -57,7 +57,7 @@
                         <div class="row">
                             <div class="col-md-7 col-sm-10 text-truncate">
                                 <div class="row">
-                                    <div class="col text-truncate">
+                                    <div class="col text-truncate col-name">
                                         <i class="icon {{ $icon }}"></i>
                                         {{ $folderOrFile->name }}
                                     </div>
