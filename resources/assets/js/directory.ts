@@ -10,6 +10,7 @@ $('.directory-container .share').click((event) => {
 
         $row.find('.share').removeClass('far').addClass('fas');
         $modal.find('#share-modal-info').addClass('d-none');
+        $modal.find('#share-modal-file').html($row.find('.col-name').text());
         $modal.find('#share-modal-url').val(response.data.url);
         window['$']('#share-modal').modal('show');
     });
