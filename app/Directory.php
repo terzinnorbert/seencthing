@@ -197,7 +197,7 @@ class Directory extends Model
     {
         $response = app(Rest::class)->getDbFile($this->folder->name, trim($this->getPath(), '/'));
 
-        return false === $response['local']['invalid'];
+        return false === $response['local']['invalid'] && 100 == $this->progress();
     }
 
     public function progress()
