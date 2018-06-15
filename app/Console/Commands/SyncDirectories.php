@@ -2,8 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Directory;
-use Illuminate\Console\Command;
+use App\Folder;
 
 class SyncDirectories extends SyncthingCommand
 {
@@ -38,6 +37,8 @@ class SyncDirectories extends SyncthingCommand
      */
     public function handle()
     {
-        Directory::syncFromSyncthing();
+        foreach (Folder::all() as $folder) {
+            $folder->syncDirectoryFromSyncthing();
+        }
     }
 }

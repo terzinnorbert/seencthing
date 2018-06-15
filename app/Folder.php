@@ -105,6 +105,7 @@ class Folder extends Model
 
     /**
      * @param Collection $files
+     * @param bool $updateModel
      * @return bool
      */
     public function excludeFiles(Collection $files)
@@ -112,8 +113,10 @@ class Folder extends Model
         $client = app(Rest::class);
         $ignores = $client->getIgnores($this->name);
 
-        foreach ($files as $file) {
-            unset($ignores[array_search('!'.$file->getPath(), $ignores)]);
+        foreach ($files as $fileKey => $file) {
+            if (false !== ($index = array_search('!'.$file->getPath(), $ignores))) {
+                unset($ignores[$index]);
+            }
         }
 
         $client->postDbIgnores($this->name, $ignores);
@@ -123,7 +126,10 @@ class Folder extends Model
             $file->expiration_time = null;
             $file->save();
 
-            unlink($file->getStoragePath());
+            if (file_exists($path = $file->getStoragePath())) {
+                unlink($path);
+            }
+            $file->deleteEmptyParentFolders();
         }
 
         return true;
@@ -148,7 +154,10 @@ class Folder extends Model
         $syncStartDate = Carbon::now();
         $structure = app(Rest::class)->getDbBrowse($this->name, Directory::FOLDER_DEPTH);
         Directory::syncFilesAndFoldersFromResponse($this->id, $structure);
-        Directory::where('sync_time', '<', $syncStartDate)->where('folder_id', $this->id)->delete();
+        Directory::where('sync_time', '<', $syncStartDate)
+            ->where('folder_id', $this->id)
+            ->whereNull('expiration_time')
+            ->delete();
     }
 
     /**

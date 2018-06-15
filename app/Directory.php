@@ -31,15 +31,6 @@ class Directory extends Model
         'hash',
     ];
 
-    public static function syncFromSyncthing()
-    {
-        $syncStartDate = Carbon::now();
-        foreach (Folder::all() as $folder) {
-            $folder->syncDirectoryFromSyncthing();
-        }
-        Directory::where('sync_time', '<', $syncStartDate)->delete();
-    }
-
     /**
      * @param integer $folderId
      * @param array $structure
@@ -245,7 +236,7 @@ class Directory extends Model
      */
     public function getStoragePath()
     {
-        return storage_path(self::PATH_SYNCTHING).'/'.$this->folder->name.$this->getPath();
+        return $this->getStorageBasePath().$this->getPath();
     }
 
     public function getShareUrl()
@@ -257,6 +248,19 @@ class Directory extends Model
         return url('share/'.$this->hash);
     }
 
+    public function deleteEmptyParentFolders()
+    {
+        $baseDirectory = $this->getStorageBasePath();
+        $parentDirectory = dirname($this->getStoragePath());
+        while ($parentDirectory != $baseDirectory) {
+            if (!$this->isEmptyLocalFolder($parentDirectory)) {
+                return;
+            }
+            rmdir($parentDirectory);
+            $parentDirectory = dirname($parentDirectory);
+        }
+    }
+
     protected function generateHash()
     {
         do {
@@ -265,5 +269,26 @@ class Directory extends Model
 
         $this->hash = $hash;
         $this->save();
+    }
+
+    /**
+     * @param $path
+     * @return bool
+     */
+    protected function isEmptyLocalFolder($path)
+    {
+        if (!is_dir($path) || 2 < count(scandir($path))) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getStorageBasePath()
+    {
+        return storage_path(self::PATH_SYNCTHING).'/'.$this->folder->name;
     }
 }
