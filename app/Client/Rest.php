@@ -11,7 +11,7 @@ class Rest extends Client
 
     public function __construct()
     {
-        parent::__construct(env('SYNCTHING_HOST'), env('SYNCTHING_API_KEY'));
+        parent::__construct(config('syncthing.host'), config('syncthing.key'));
     }
 
     /**

@@ -33,5 +33,5 @@
             @endif
         </div>
     </div>
-    <script src="{{asset('js/share.js')}}"></script>
+    <script src="{{ mix('js/share.js') }}"></script>
 @endsection

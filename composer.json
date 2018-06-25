@@ -1,8 +1,10 @@
 {
-  "name": "laravel/laravel",
-  "description": "The Laravel Framework.",
+  "name": "terzinnorbert/seencthing",
+  "description": "Syncthing web viewer",
   "keywords": [
-    "framework",
+    "syncthing",
+    "web viewer",
+    "seencthing",
     "laravel"
   ],
   "license": "MIT",
@@ -43,15 +45,21 @@
   },
   "scripts": {
     "post-root-package-install": [
-      "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
-      "@php artisan syncthing:key:generate"
+      "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
     ],
     "post-create-project-cmd": [
-      "@php artisan key:generate"
+      "@php artisan key:generate",
+      "@php artisan syncthing:key:generate"
     ],
     "post-autoload-dump": [
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
       "@php artisan package:discover"
+    ],
+    "deploy": [
+      "composer install --optimize-autoloader --no-dev",
+      "@php artisan migrate",
+      "@php artisan config:cache",
+      "npm run prod"
     ]
   },
   "config": {

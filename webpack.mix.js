@@ -19,3 +19,7 @@ mix.js('resources/assets/js/app.js', 'public/js')
     .autoload({
         jquery: ['$', 'global.jQuery', "jQuery", "global.$", "jquery", "global.jquery"]
     });
+
+if (mix.inProduction()) {
+    mix.version();
+}

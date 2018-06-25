@@ -11,6 +11,8 @@
 |
 */
 
+use App\Http\Middleware\SyncthingIsAvailable;
+
 Route::get(
     '/',
     function () {
@@ -33,7 +35,7 @@ Route::get(
 );
 
 Route::group(
-    ['middleware' => ['auth']],
+    ['middleware' => ['auth', SyncthingIsAvailable::class]],
     function () {
         Route::get('/devices', 'DeviceController@index')->name('devices');
         Route::post('/devices', 'DeviceController@add');

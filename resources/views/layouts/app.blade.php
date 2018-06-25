@@ -7,9 +7,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name') }}</title>
     <link rel="shortcut icon" href="{{ asset('favicon.png') }}"/>
-    <script src="{{ asset('js/app.js') }}" defer></script>
-    <script src="{{ asset('js/notify.js') }}" defer></script>
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <script src="{{ mix('js/app.js') }}" defer></script>
+    <script src="{{ mix('js/notify.js') }}" defer></script>
+    <link href="{{ mix('css/app.css') }}" rel="stylesheet">
 </head>
 <body>
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">

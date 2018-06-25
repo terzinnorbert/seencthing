@@ -88,6 +88,6 @@
         </div>
     </div>
     @include('layouts.modal.share')
-    <script src="{{asset('js/directory.js')}}"></script>
+    <script src="{{ mix('js/directory.js') }}"></script>
 @endsection
 

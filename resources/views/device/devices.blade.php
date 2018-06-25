@@ -41,6 +41,6 @@
             </div>
         @endforeach
     </div>
-    <script src="{{asset('js/devices.js')}}"></script>
+    <script src="{{ mix('js/devices.js') }}"></script>
 @endsection
 
