@@ -3,7 +3,7 @@
 @section('content')
     <div class="row justify-content-center">
         @foreach($folders as $folder)
-            <div class="col-md-8">
+            <div class="col-md-6">
                 <div class="card mb-2">
                     <div class="card-header">{{ $folder->label }} - {{ $folder->name }}</div>
 
@@ -19,6 +19,10 @@
                             <i class="fas fa-file"></i> Files: {{ $info['globalFiles'] }}</div>
                         <div class="mb-1">
                             <i class="fas fa-folder"></i> Folders: {{ $info['globalDirectories'] }}<br></div>
+                        <div class="mb-1">
+                            <i class="fas fa-globe"></i> Devices: {{ count($folder->getOnlineDevices()) }}
+                            / {{ count($folder->getDevices()) }}<br>
+                        </div>
                         <div class="mb-1">
                             <i class="fas fa-hdd"></i> Size: {{ App\Folder::fileSize($info['globalBytes']) }}<br>
                         </div>
