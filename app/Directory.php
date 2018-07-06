@@ -117,6 +117,39 @@ class Directory extends Model
     }
 
     /**
+     * @param string $currentPath
+     * @return array
+     */
+    public static function generateBreadcrumbItems($currentPath = '/')
+    {
+        $breadcrumbs = [];
+        $pathUrl = url()->current().'?path=';
+        if ('/' == $currentPath) {
+            $pieces = [''];
+        } else {
+            $pieces = explode('/', $currentPath);
+        }
+        $isLast = count($pieces) - 1;
+        $currentPath = '';
+
+        foreach ($pieces as $index => $item) {
+
+            if ('/' == $currentPath) {
+                $currentPath = '';
+            }
+
+            $currentPath .= '/'.$item;
+            $breadcrumbs[] = [
+                'name'   => $index ? $item : 'Home',
+                'path'   => $pathUrl.$currentPath,
+                'active' => $isLast === $index,
+            ];
+        }
+
+        return $breadcrumbs;
+    }
+
+    /**
      * @return Folder|\Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function folder()
