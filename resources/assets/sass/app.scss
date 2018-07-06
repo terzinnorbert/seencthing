@@ -8,6 +8,7 @@
 
 body {
     padding-top: 5rem;
+    padding-bottom: 2rem;
     font-family: "Roboto";
 }
 
@@ -39,4 +40,11 @@ body {
     position: fixed;
     bottom: 15px;
     right: 15px;
+}
+
+#app-version {
+    position: absolute;
+    bottom: 0;
+    right: 1rem;
+    opacity: 0.6;
 }

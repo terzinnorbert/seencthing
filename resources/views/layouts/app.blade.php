@@ -30,5 +30,6 @@
     @yield('content')
 </main>
 @include('layouts.notification')
+<div id="app-version">{{ config('app.version') }}</div>
 </body>
 </html>

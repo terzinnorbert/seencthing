@@ -59,6 +59,7 @@
       "composer install --optimize-autoloader --no-dev",
       "@php artisan migrate",
       "@php artisan config:cache",
+      "@php artisan update-version",
       "npm run prod"
     ]
   },

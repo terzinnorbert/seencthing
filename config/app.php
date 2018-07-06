@@ -13,7 +13,8 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Seencthing'),
+    'name'    => env('APP_NAME', 'Seencthing'),
+    'version' => env('APP_VERSION', ''),
 
     /*
     |--------------------------------------------------------------------------
