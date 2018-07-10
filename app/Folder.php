@@ -4,8 +4,8 @@ namespace App;
 
 use Carbon\Carbon;
 use App\Client\Rest;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 class Folder extends Model
 {
@@ -105,7 +105,6 @@ class Folder extends Model
 
     /**
      * @param Collection $files
-     * @param bool $updateModel
      * @return bool
      */
     public function excludeFiles(Collection $files)
@@ -158,6 +157,15 @@ class Folder extends Model
             ->where('folder_id', $this->id)
             ->whereNull('expiration_time')
             ->delete();
+    }
+
+    public function syncDirectoryPreview()
+    {
+        foreach ($this->directory()->hasNoPreview()->files()->get() as $directory) {
+            if ($directory->isPreviewable()) {
+                $directory->createPreview();
+            }
+        }
     }
 
     /**

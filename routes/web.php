@@ -42,6 +42,7 @@ Route::group(
         Route::get('/folders', 'FolderController@index')->name('folders');
         Route::get('/folders/{folder}/refresh', 'FolderController@refresh');
         Route::get('/folders/{folder}', 'DirectoryController@listing')->name('files');
+        Route::get('/folders/{folder}/view/{view}', 'DirectoryController@view')->name('directory.view');
         Route::group(
             ['middleware' => [\App\Http\Middleware\HasOnlineDevice::class]],
             function () {
@@ -51,6 +52,7 @@ Route::group(
             }
         );
         Route::get('/folders/{folder}/directory/{directory}/share', 'DirectoryController@getShareUrl');
+        Route::get('/folders/{folder}/directory/{directory}/preview', 'DirectoryController@getPreview');
     }
 );
 

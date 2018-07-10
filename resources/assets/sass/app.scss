@@ -48,3 +48,24 @@ body {
     right: 1rem;
     opacity: 0.6;
 }
+
+.directory-container.grid-group {
+    .grid-group-item {
+        @extend .col-md-3;
+        @extend .mt-4;
+        .card-body {
+            text-align: center;
+
+            .card-icon {
+                font-size: 6rem;
+                height: 10rem;
+            }
+        }
+        .card-img-top {
+            height: 10rem;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+        }
+    }
+}

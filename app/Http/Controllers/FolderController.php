@@ -33,6 +33,7 @@ class FolderController extends Controller
     {
         $folder->deleteExpiredFiles();
         $folder->syncDirectoryFromSyncthing();
+        $folder->syncDirectoryPreview();
 
         return redirect('/folders');
     }

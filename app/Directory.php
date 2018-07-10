@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Directory\Preview;
 use Carbon\Carbon;
 use App\Client\Rest;
 use Illuminate\Database\Eloquent\Model;
@@ -22,6 +23,7 @@ class Directory extends Model
         'folder_id',
         'path',
         'name',
+        'preview',
         'type',
         'sync_time',
         'modification_time',
@@ -209,9 +211,20 @@ class Directory extends Model
         return self::generatePath($this->path, $this->name);
     }
 
+    /**
+     * @return mixed
+     */
     public function markToDownload()
     {
         return $this->folder->includeFile($this);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function markToExclude()
+    {
+        return $this->folder->excludeFiles(collect([$this]));
     }
 
     /**
@@ -224,6 +237,9 @@ class Directory extends Model
         return false === $response['local']['invalid'] && 100 == $this->progress();
     }
 
+    /**
+     * @return float|int
+     */
     public function progress()
     {
         $localSize = 0;
@@ -234,6 +250,9 @@ class Directory extends Model
         return number_format($localSize / (int)$this->size, 0) * 100;
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
     public function download()
     {
         while (!$this->isDownloadable()) {
@@ -272,6 +291,9 @@ class Directory extends Model
         return $this->getStorageBasePath().$this->getPath();
     }
 
+    /**
+     * @return \Illuminate\Contracts\Routing\UrlGenerator|string
+     */
     public function getShareUrl()
     {
         if (empty($this->hash)) {
@@ -292,6 +314,70 @@ class Directory extends Model
             rmdir($parentDirectory);
             $parentDirectory = dirname($parentDirectory);
         }
+    }
+
+    /**
+     * @param $query
+     * @return mixed
+     */
+    public function scopeHasNoPreview($query)
+    {
+        return $query->whereNull('preview');
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasPreview()
+    {
+        return null !== $this->preview;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPreviewUrl()
+    {
+        return '/'.implode(
+                '/',
+                [
+                    'folders',
+                    $this->folder_id,
+                    'directory',
+                    $this->id,
+                    'preview',
+                ]
+            );
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPreviewable()
+    {
+        return ($this->isFile() && Preview::isSupported($this->name) && null === !$this->hasPreview());
+    }
+
+    /**
+     * @return bool
+     */
+    public function createPreview()
+    {
+        echo "DOIT:".$this->name."\n";
+        $this->markToDownload();
+
+        $sleep = 0;
+        do {
+            sleep(2);
+            if (++$sleep > 30) {
+                return false;
+            }
+        } while (!$this->isDownloadable());
+        $this->preview = Preview::create($this->getStoragePath());
+        $this->save();
+
+
+        $this->markToExclude();
     }
 
     protected function generateHash()

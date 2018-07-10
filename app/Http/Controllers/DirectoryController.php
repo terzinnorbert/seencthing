@@ -33,12 +33,24 @@ class DirectoryController extends Controller
         }
 
         return view(
-            'directory.listing',
+            'directory.index',
             [
                 'folder'          => $folder,
                 'foldersAndFiles' => $folder->directory()->path($path)->orderBy('type')->get(),
             ]
         );
+    }
+
+    /**
+     * @param Folder $folder
+     * @param $view
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function view(Folder $folder, $view)
+    {
+        $view = in_array($view, ['grid', 'list']) ? $view : 'list';
+
+        return back()->withCookie(cookie()->forever('directory_view', $view));
     }
 
     /**
@@ -86,5 +98,19 @@ class DirectoryController extends Controller
     public function getShareUrl(Folder $folder, Directory $directory)
     {
         return $this->success(['url' => $directory->getShareUrl()]);
+    }
+
+    /**
+     * @param Folder $folder
+     * @param Directory $directory
+     * @return string|\Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function getPreview(Folder $folder, Directory $directory)
+    {
+        if ($directory->hasPreview()) {
+            return response()->download($directory->preview, $directory->name);
+        }
+
+        return '';
     }
 }
