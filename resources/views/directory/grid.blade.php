@@ -25,7 +25,7 @@
             @endphp
         @endif
 
-        <div class="grid-group-item" data-type="{{ $type }}"
+        <div class="grid-group-item {{ 'folder' == $type ? 'cursor' : '' }}" data-type="{{ $type }}"
              data-path="{{ url()->current().'?path='.$folderOrFile->getPath() }}"
              data-id="{{ $folderOrFile->id }}"
              data-state="{{ $folderOrFile->state }}">
