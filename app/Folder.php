@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 
 class Folder extends Model
 {
+    const DIRECTORY_SYNC_LIMIT = 100;
     protected $fillable = ['name', 'label', 'scan_time', 'sync_time'];
 
     public static function syncFromSyncthing()
@@ -161,8 +162,9 @@ class Folder extends Model
 
     public function syncDirectoryPreview()
     {
-        foreach ($this->directory()->hasNoPreview()->files()->get() as $directory) {
-            if ($directory->isPreviewable()) {
+        if ($this->hasOnlineDevice()) {
+            foreach ($this->directory()->hasNoPreview()->files()->limit(self::DIRECTORY_SYNC_LIMIT)->get(
+            ) as $directory) {
                 $directory->createPreview();
             }
         }

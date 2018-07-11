@@ -36,13 +36,21 @@ class Preview
 
         return in_array(
             $extension,
-            [
-                'png',
-                'jpeg',
-                'jpg',
-            ]
+            self::getSupportedExtensions()
         );
 
+    }
+
+    /**
+     * @return array
+     */
+    public static function getSupportedExtensions()
+    {
+        return [
+            'png',
+            'jpeg',
+            'jpg',
+        ];
     }
 
     /**

@@ -322,7 +322,13 @@ class Directory extends Model
      */
     public function scopeHasNoPreview($query)
     {
-        return $query->whereNull('preview');
+        return $query->whereNull('preview')->where(
+            function ($query) {
+                foreach (Preview::getSupportedExtensions() as $extension) {
+                    $query->orWhere('name', 'like', '%.'.$extension);
+                }
+            }
+        );
     }
 
     /**
@@ -330,7 +336,7 @@ class Directory extends Model
      */
     public function hasPreview()
     {
-        return null !== $this->preview;
+        return !empty($this->preview);
     }
 
     /**
@@ -355,7 +361,7 @@ class Directory extends Model
      */
     public function isPreviewable()
     {
-        return ($this->isFile() && Preview::isSupported($this->name) && null === !$this->hasPreview());
+        return ($this->isFile() && Preview::isSupported($this->name) && !$this->hasPreview());
     }
 
     /**
@@ -363,7 +369,6 @@ class Directory extends Model
      */
     public function createPreview()
     {
-        echo "DOIT:".$this->name."\n";
         $this->markToDownload();
 
         $sleep = 0;
