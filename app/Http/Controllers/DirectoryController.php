@@ -36,7 +36,7 @@ class DirectoryController extends Controller
             'directory.index',
             [
                 'folder'          => $folder,
-                'foldersAndFiles' => $folder->directory()->path($path)->orderBy('type')->get(),
+                'foldersAndFiles' => $folder->directory()->path($path)->orderBy('type')->orderBy('name')->get(),
             ]
         );
     }
