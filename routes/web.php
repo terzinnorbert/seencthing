@@ -43,6 +43,7 @@ Route::group(
         Route::get('/folders/{folder}/refresh', 'FolderController@refresh');
         Route::get('/folders/{folder}', 'DirectoryController@listing')->name('files');
         Route::get('/folders/{folder}/view/{view}', 'DirectoryController@view')->name('directory.view');
+        Route::get('/folders/{folder}/order/{order}/{direction}', 'DirectoryController@order')->name('directory.order');
         Route::group(
             ['middleware' => [\App\Http\Middleware\HasOnlineDevice::class]],
             function () {

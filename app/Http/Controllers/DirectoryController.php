@@ -10,6 +10,18 @@ use Illuminate\Http\Request;
 
 class DirectoryController extends Controller
 {
+    const DIR_ASC = 'ASC';
+    const DIR_DESC = 'DESC';
+
+    const ORDER_NAME = 'name';
+    const ORDER_MODIFICATION = 'modification_time';
+    const ORDER_SIZE = 'size';
+
+    private $availableOrders = [
+        self::ORDER_NAME,
+        self::ORDER_MODIFICATION,
+        self::ORDER_SIZE,
+    ];
     /**
      * @var Rest
      */
@@ -31,12 +43,28 @@ class DirectoryController extends Controller
         if (empty($path)) {
             $request->merge(['path' => $path = '/']);
         }
+        $order = $this->getCustomOrder();
+        if (!$order) {
+            $order = [self::ORDER_NAME, self::DIR_ASC];
+        }
 
         return view(
             'directory.index',
             [
                 'folder'          => $folder,
-                'foldersAndFiles' => $folder->directory()->path($path)->orderBy('type')->orderBy('name')->get(),
+                'order'           => $order,
+                'foldersAndFiles' => $folder->directory()->path($path)->orderBy('type')
+                    ->when(
+                        $order,
+                        function ($query, $order) {
+                            $query = $query->orderBy($order[0], $order[1]);
+                            // secondary order by name
+                            if (self::ORDER_NAME != $order[0]) {
+                                return $query->orderBy(self::ORDER_NAME);
+                            }
+                        }
+                    )
+                    ->get(),
             ]
         );
     }
@@ -51,6 +79,23 @@ class DirectoryController extends Controller
         $view = in_array($view, ['grid', 'list']) ? $view : 'list';
 
         return back()->withCookie(cookie()->forever('directory_view', $view));
+    }
+
+    /**
+     * @param Folder $folder
+     * @param $order
+     * @param $direction
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function order(Folder $folder, $order, $direction)
+    {
+        $orderAndDirection = $this->getValidatedOrder($order, $direction);
+
+        if (!$orderAndDirection) {
+            return back();
+        }
+
+        return back()->withCookie(cookie()->forever('order', implode('|', $orderAndDirection)));
     }
 
     /**
@@ -112,5 +157,33 @@ class DirectoryController extends Controller
         }
 
         return '';
+    }
+
+    /**
+     * @return array|bool
+     */
+    private function getCustomOrder()
+    {
+        if (!($order = request()->cookie('order', false))) {
+            return false;
+        }
+        list($order, $direction) = explode('|', $order);
+
+        return $this->getValidatedOrder($order, $direction);
+    }
+
+    /**
+     * @param $order
+     * @param $direction
+     * @return array|bool
+     */
+    private function getValidatedOrder($order, $direction)
+    {
+        if (!in_array($order, $this->availableOrders)) {
+            return false;
+        }
+        $direction = in_array($direction, [self::DIR_ASC, self::DIR_DESC]) ? $direction : self::DIR_ASC;
+
+        return [$order, $direction];
     }
 }

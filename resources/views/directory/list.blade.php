@@ -1,8 +1,8 @@
 <h5 class="mx-3">
     <div class="row">
-        <div class="col-md-7 col-sm-10">Name</div>
-        <div class="col-3 d-none d-md-block text-right">Last modified</div>
-        <div class="col-2 d-none d-sm-block text-right">Size</div>
+        <div class="col-md-7 col-sm-10">@include('layouts.order',['name' => \App\Http\Controllers\DirectoryController::ORDER_NAME, 'label' => 'Name', 'order' => $order, 'folder' => $folder])</div>
+        <div class="col-3 d-none d-md-block text-right">@include('layouts.order',['name' => \App\Http\Controllers\DirectoryController::ORDER_MODIFICATION, 'label' => 'Last modified', 'order' => $order, 'folder' => $folder])</div>
+        <div class="col-2 d-none d-sm-block text-right">@include('layouts.order',['name' => \App\Http\Controllers\DirectoryController::ORDER_SIZE, 'label' => 'Size', 'order' => $order, 'folder' => $folder])</div>
     </div>
 </h5>
 <div class="directory-container list-group">
