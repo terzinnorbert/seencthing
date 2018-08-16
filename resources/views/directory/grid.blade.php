@@ -31,12 +31,12 @@
              data-state="{{ $folderOrFile->state }}">
             <div class="card">
                 @if ($folderOrFile->hasPreview())
-                    <img class="card-img-top cursor"
-                         style="background-image: url('{{ $folderOrFile->getPreviewUrl() }}');"
+                    <div class="card-img-top cursor lazy"
                          data-fancybox="gallery"
+                         data-href="{{ $folderOrFile->getPreviewUrl() }}"
                          data-src="{{ $folderOrFile->getPreviewUrl() }}"
                          data-caption="{{ $folderOrFile->name }}"
-                    >
+                    ></div>
                 @endif
                 <div class="card-body">
                     @if (!$folderOrFile->hasPreview())

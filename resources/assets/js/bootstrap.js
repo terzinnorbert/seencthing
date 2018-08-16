@@ -14,6 +14,13 @@ try {
 } catch (e) {
 }
 
+require('../../../node_modules/jquery-lazy/jquery.lazy.js');
+$(function () {
+    $('.lazy').Lazy({
+        removeAttribute: false
+    });
+});
+
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
  * to our Laravel back-end. This library automatically handles sending the
