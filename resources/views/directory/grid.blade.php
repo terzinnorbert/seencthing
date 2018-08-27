@@ -1,3 +1,10 @@
+<h5 class="mx-3">
+    <div class="d-flex">
+        <div class="px-2">@include('layouts.order',['name' => \App\Http\Controllers\DirectoryController::ORDER_NAME, 'label' => 'Name', 'order' => $order, 'folder' => $folder])</div>
+        <div class="px-2">@include('layouts.order',['name' => \App\Http\Controllers\DirectoryController::ORDER_MODIFICATION, 'label' => 'Last modified', 'order' => $order, 'folder' => $folder])</div>
+        <div class="px-2">@include('layouts.order',['name' => \App\Http\Controllers\DirectoryController::ORDER_SIZE, 'label' => 'Size', 'order' => $order, 'folder' => $folder])</div>
+    </div>
+</h5>
 <div class="directory-container grid-group row">
     @if ('/' !== request('path','/'))
         <div class="grid-group-item cursor" data-type="parent"
