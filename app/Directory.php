@@ -101,62 +101,19 @@ class Directory extends Model
     }
 
     /**
-     * @param string $path
-     * @return string
-     */
-    public static function generateParentPath($path = '/')
-    {
-        if (is_null($path) || '/' == $path) {
-            return '/';
-        }
-
-        $path = explode('/', $path);
-        if (2 == count($path)) {
-            return self::generateParentPath();
-        }
-
-        return implode('/', array_slice($path, 0, -1));
-    }
-
-    /**
-     * @param string $currentPath
-     * @return array
-     */
-    public static function generateBreadcrumbItems($currentPath = '/')
-    {
-        $breadcrumbs = [];
-        $pathUrl = url()->current().'?path=';
-        if ('/' == $currentPath) {
-            $pieces = [''];
-        } else {
-            $pieces = explode('/', $currentPath);
-        }
-        $isLast = count($pieces) - 1;
-        $currentPath = '';
-
-        foreach ($pieces as $index => $item) {
-
-            if ('/' == $currentPath) {
-                $currentPath = '';
-            }
-
-            $currentPath .= '/'.$item;
-            $breadcrumbs[] = [
-                'name'   => $index ? $item : 'Home',
-                'path'   => $pathUrl.$currentPath,
-                'active' => $isLast === $index,
-            ];
-        }
-
-        return $breadcrumbs;
-    }
-
-    /**
      * @return Folder|\Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function folder()
     {
         return $this->belongsTo('App\Folder');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function shares()
+    {
+        return $this->hasMany(Share::class);
     }
 
     /**
@@ -232,9 +189,7 @@ class Directory extends Model
      */
     public function isDownloadable()
     {
-        $response = app(Rest::class)->getDbFile($this->folder->name, trim($this->getPath(), '/'));
-
-        return false === $response['local']['invalid'] && 100 == $this->progress();
+        return 100 == $this->progress();
     }
 
     /**
@@ -292,15 +247,17 @@ class Directory extends Model
     }
 
     /**
+     * @param int $type
      * @return \Illuminate\Contracts\Routing\UrlGenerator|string
      */
-    public function getShareUrl()
+    public function getShareUrl($type = Share::TYPE_SIMPLE)
     {
-        if (empty($this->hash)) {
-            $this->generateHash();
+        $share = $this->shares()->type($type)->first();
+        if (!$share) {
+            $share = Share::generate($this, $type);
         }
 
-        return url('share/'.$this->hash);
+        return url('share/'.$share->hash);
     }
 
     public function deleteEmptyParentFolders()
@@ -383,16 +340,6 @@ class Directory extends Model
 
 
         $this->markToExclude();
-    }
-
-    protected function generateHash()
-    {
-        do {
-            $hash = str_random(64);
-        } while (Directory::where('hash', $hash)->get()->count());
-
-        $this->hash = $hash;
-        $this->save();
     }
 
     /**

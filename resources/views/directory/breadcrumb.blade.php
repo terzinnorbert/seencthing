@@ -1,6 +1,6 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-        @foreach(\App\Directory::generateBreadcrumbItems(request('path','')) as $breadcrumb)
+        @foreach($handler->generateBreadcrumbItems(request('path','')) as $breadcrumb)
             @if ($breadcrumb['active'])
                 <li class="breadcrumb-item active"
                     aria-current="page">{{ $breadcrumb['name'] }}</li>

@@ -3,15 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Directory;
+use App\Share;
 
-class ShareController extends Controller
+class ShareController extends AbstractFileManagerController
 {
-    public function index($hash)
+    const VIEW_FOLDER = 'share.folder';
+    /**
+     * @var $sharedDirectory Directory
+     */
+    protected $sharedDirectory;
+
+    /**
+     * @param Share $share
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
+     */
+    public function index(Share $share)
     {
-        /**
-         * @var Directory $directory
-         */
-        $directory = Directory::where('hash', $hash)->firstOrFail();
+        $this->sharedDirectory = $directory = $share->directory;
         $devices = $directory->folder->getDevices();
         $peers = [
             'available' =>
@@ -26,35 +34,50 @@ class ShareController extends Controller
             'all'       => count($devices),
         ];
 
+        if ($directory->isFolder()) {
+            return $this->folderListing($directory->folder, $share);
+        }
+
         return view('share.index', compact('directory', 'peers'));
     }
 
-    public function download($hash)
+    /**
+     * @param Share $share
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function downloadFile(Share $share)
     {
         /**
          * @var Directory $directory
          */
-        $directory = Directory::where('hash', $hash)->firstOrFail();
+        $directory = $share->$directory;
         $directory->markToDownload();
 
         return $directory->download();
     }
 
-    public function markToDownload($hash)
+    /**
+     * @param Share $share
+     */
+    public function markToDownloadFile(Share $share)
     {
         /**
          * @var Directory $directory
          */
-        $directory = Directory::where('hash', $hash)->firstOrFail();
+        $directory = $share->$directory;
         $directory->markToDownload();
     }
 
-    public function progress($hash)
+    /**
+     * @param Share $share
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function progress(Share $share)
     {
         /**
          * @var Directory $directory
          */
-        $directory = Directory::where('hash', $hash)->firstOrFail();
+        $directory = $share->$directory;
 
         return $this->success(
             [
@@ -62,5 +85,36 @@ class ShareController extends Controller
                 'progress'     => $directory->progress(),
             ]
         );
+    }
+
+    /**
+     * @param Directory $directory
+     * @return string
+     */
+    public function getDirectoryPath(Directory $directory)
+    {
+        return str_replace_first($this->sharedDirectory->getPath(), '', $directory->getPath());
+    }
+
+    /**
+     * @param Directory $directory
+     * @param $path
+     * @return string
+     */
+    protected function getNormalizedPath(Directory $directory, $path)
+    {
+        if ('/' == $path) {
+            return $directory->getPath();
+        }
+
+        return $directory->getPath().$path;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getBreadcrumbHomeTitle()
+    {
+        return $this->sharedDirectory->name;
     }
 }

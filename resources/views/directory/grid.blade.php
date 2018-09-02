@@ -8,13 +8,13 @@
 <div class="directory-container grid-group row">
     @if ('/' !== request('path','/'))
         <div class="grid-group-item cursor" data-type="parent"
-             data-path="{{ url()->current().'?path='.App\Directory::generateParentPath(request('path'))}}">
+             data-path="{{ url()->current().'?path=' . $handler->generateParentPath(request('path')) }}">
             <div class="card">
                 <div class="card-body">
                     <div class="card-icon">
                         <i class="fas fa-level-up-alt"></i>
                     </div>
-                    <h5 class="card-title">Card title</h5>
+                    <h5 class="card-title">..</h5>
                 </div>
             </div>
         </div>
@@ -33,7 +33,7 @@
         @endif
 
         <div class="grid-group-item {{ 'folder' == $type ? 'cursor' : '' }}" data-type="{{ $type }}"
-             data-path="{{ url()->current().'?path='.$folderOrFile->getPath() }}"
+             data-path="{{ url()->current().'?path=' . $handler->getDirectoryPath($folderOrFile) }}"
              data-id="{{ $folderOrFile->id }}"
              data-state="{{ $folderOrFile->state }}">
             <div class="card">

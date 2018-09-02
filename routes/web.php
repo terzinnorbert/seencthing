@@ -11,7 +11,12 @@
 |
 */
 
+use App\Folder;
+use App\Http\Controllers\DirectoryController;
+use App\Http\Controllers\ShareController;
 use App\Http\Middleware\SyncthingIsAvailable;
+use App\Share;
+use App\Directory;
 
 Route::get(
     '/',
@@ -40,20 +45,41 @@ Route::group(
         Route::get('/devices', 'DeviceController@index')->name('devices');
         Route::post('/devices', 'DeviceController@add');
         Route::get('/folders', 'FolderController@index')->name('folders');
-        Route::get('/folders/{folder}/refresh', 'FolderController@refresh');
-        Route::get('/folders/{folder}', 'DirectoryController@listing')->name('files');
-        Route::get('/folders/{folder}/view/{view}', 'DirectoryController@view')->name('directory.view');
-        Route::get('/folders/{folder}/order/{order}/{direction}', 'DirectoryController@order')->name('directory.order');
-        Route::group(
-            ['middleware' => [\App\Http\Middleware\HasOnlineDevice::class]],
+        Route::prefix('/folders/{folder}')->group(
             function () {
-                Route::post('/folders/{folder}/directory/{directory}/download', 'DirectoryController@markToDownload');
-                Route::get('/folders/{folder}/directory/{directory}/download', 'DirectoryController@download');
-                Route::get('/folders/{folder}/directory/{directory}/state', 'DirectoryController@isDownloadable');
+                Route::get('/refresh', 'FolderController@refresh');
+                Route::get('/', 'DirectoryController@listing')->name('files');
+                Route::get('/view/{view}', 'DirectoryController@view')->name('directory.view');
+                Route::get('/order/{order}/{direction}', 'DirectoryController@order')->name(
+                    'directory.order'
+                );
+                Route::group(
+                    ['middleware' => [\App\Http\Middleware\HasOnlineDevice::class]],
+                    function () {
+                        Route::post(
+                            '/directory/{directory}/download',
+                            function (Folder $folder, Directory $directory) {
+                                return app(DirectoryController::class)->markToDownload($directory);
+                            }
+                        );
+                        Route::get(
+                            '/directory/{directory}/download',
+                            function (Folder $folder, Directory $directory) {
+                                return app(DirectoryController::class)->download($directory);
+                            }
+                        );
+                        Route::get(
+                            '/directory/{directory}/state',
+                            function (Folder $folder, Directory $directory) {
+                                return app(DirectoryController::class)->isDownloadable($directory);
+                            }
+                        );
+                    }
+                );
+                Route::get('/directory/{directory}/share', 'DirectoryController@getShareUrl');
+                Route::get('/directory/{directory}/preview', 'DirectoryController@getPreview');
             }
         );
-        Route::get('/folders/{folder}/directory/{directory}/share', 'DirectoryController@getShareUrl');
-        Route::get('/folders/{folder}/directory/{directory}/preview', 'DirectoryController@getPreview');
     }
 );
 
@@ -63,7 +89,34 @@ Route::get(
         return redirect('/');
     }
 );
-Route::get('/share/{hash}', 'ShareController@index');
-Route::get('/share/{hash}/download', 'ShareController@download');
-Route::post('/share/{hash}/download', 'ShareController@markToDownload');
-Route::get('/share/{hash}/progress', 'ShareController@progress');
+Route::prefix('/share/{share}')->group(
+    function () {
+        Route::get('/', 'ShareController@index');
+        Route::get('/download', 'ShareController@downloadFile');
+        Route::post('/download', 'ShareController@markToDownloadFile');
+        Route::get('/progress', 'ShareController@progress');
+        Route::group(
+            ['middleware' => [\App\Http\Middleware\HasOnlineDevice::class]],
+            function () {
+                Route::post(
+                    '/directory/{directory}/download',
+                    function (Share $share, Directory $directory) {
+                        return app(ShareController::class)->markToDownload($directory);
+                    }
+                );
+                Route::get(
+                    '/directory/{directory}/download',
+                    function (Share $share, Directory $directory) {
+                        return app(ShareController::class)->download($directory);
+                    }
+                );
+                Route::get(
+                    '/directory/{directory}/state',
+                    function (Share $share, Directory $directory) {
+                        return app(ShareController::class)->isDownloadable($directory);
+                    }
+                );
+            }
+        );
+    }
+);

@@ -8,7 +8,7 @@
 <div class="directory-container list-group">
     @if ('/' !== request('path','/'))
         <div class="list-group-item cursor" data-type="parent"
-             data-path="{{ url()->current().'?path='.App\Directory::generateParentPath(request('path'))}}">
+             data-path="{{ url()->current().'?path='.$handler->generateParentPath(request('path'))}}">
             <div class="row">
                 <div class="col-12">
                     ..
@@ -30,7 +30,7 @@
         @endif
 
         <div class="list-group-item cursor" data-type="{{ $type }}"
-             data-path="{{ url()->current().'?path='.$folderOrFile->getPath() }}"
+             data-path="{{ url()->current().'?path=' . $handler->getDirectoryPath($folderOrFile) }}"
              data-id="{{ $folderOrFile->id }}"
              data-state="{{ $folderOrFile->state }}">
             <div class="row">
@@ -47,9 +47,10 @@
                                      aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                         </div>
-                        @if($folderOrFile->isFile())
+                        @if ($handler->isShareable())
                             <div class="col-auto share-container">
-                                <i class="fa{{ !empty($folderOrFile->hash) ? 's' : 'r' }} fa-share-square share"></i>
+                                <i class="fa{{ !empty($folderOrFile->shares->count()) ? 's' : 'r' }} fa-share-square share"
+                                   title="@lang('Share')"></i>
                             </div>
                         @endif
                     </div>

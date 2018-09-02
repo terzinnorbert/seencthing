@@ -5,23 +5,10 @@ namespace App\Http\Controllers;
 use App\Client\Rest;
 use App\Directory;
 use App\Folder;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
 
-class DirectoryController extends Controller
+class DirectoryController extends AbstractFileManagerController
 {
-    const DIR_ASC = 'ASC';
-    const DIR_DESC = 'DESC';
-
-    const ORDER_NAME = 'name';
-    const ORDER_MODIFICATION = 'modification_time';
-    const ORDER_SIZE = 'size';
-
-    private $availableOrders = [
-        self::ORDER_NAME,
-        self::ORDER_MODIFICATION,
-        self::ORDER_SIZE,
-    ];
+    protected $shareable = true;
     /**
      * @var Rest
      */
@@ -33,40 +20,12 @@ class DirectoryController extends Controller
     }
 
     /**
-     * @param Request $request
      * @param Folder $folder
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function listing(Request $request, Folder $folder)
+    public function listing(Folder $folder)
     {
-        $path = $request->input('path', '/');
-        if (empty($path)) {
-            $request->merge(['path' => $path = '/']);
-        }
-        $order = $this->getCustomOrder();
-        if (!$order) {
-            $order = [self::ORDER_NAME, self::DIR_ASC];
-        }
-
-        return view(
-            'directory.index',
-            [
-                'folder'          => $folder,
-                'order'           => $order,
-                'foldersAndFiles' => $folder->directory()->path($path)->orderBy('type')
-                    ->when(
-                        $order,
-                        function ($query, $order) {
-                            $query = $query->orderBy($order[0], $order[1]);
-                            // secondary order by name
-                            if (self::ORDER_NAME != $order[0]) {
-                                return $query->orderBy(self::ORDER_NAME);
-                            }
-                        }
-                    )
-                    ->get(),
-            ]
-        );
+        return $this->folderListing($folder);
     }
 
     /**
@@ -103,43 +62,6 @@ class DirectoryController extends Controller
      * @param Directory $directory
      * @return \Illuminate\Http\JsonResponse
      */
-    public function markToDownload(Folder $folder, Directory $directory)
-    {
-        $directory->markToDownload();
-
-        return $this->success();
-    }
-
-    /**
-     * @param Folder $folder
-     * @param Directory $directory
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function isDownloadable(Folder $folder, Directory $directory)
-    {
-        return $this->success(
-            [
-                'downloadable' => $directory->isDownloadable(),
-                'progress'     => $directory->progress(),
-            ]
-        );
-    }
-
-    /**
-     * @param Folder $folder
-     * @param Directory $directory
-     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
-     */
-    public function download(Folder $folder, Directory $directory)
-    {
-        return $directory->download();
-    }
-
-    /**
-     * @param Folder $folder
-     * @param Directory $directory
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function getShareUrl(Folder $folder, Directory $directory)
     {
         return $this->success(['url' => $directory->getShareUrl()]);
@@ -157,33 +79,5 @@ class DirectoryController extends Controller
         }
 
         return '';
-    }
-
-    /**
-     * @return array|bool
-     */
-    private function getCustomOrder()
-    {
-        if (!($order = request()->cookie('order', false))) {
-            return false;
-        }
-        list($order, $direction) = explode('|', $order);
-
-        return $this->getValidatedOrder($order, $direction);
-    }
-
-    /**
-     * @param $order
-     * @param $direction
-     * @return array|bool
-     */
-    private function getValidatedOrder($order, $direction)
-    {
-        if (!in_array($order, $this->availableOrders)) {
-            return false;
-        }
-        $direction = in_array($direction, [self::DIR_ASC, self::DIR_DESC]) ? $direction : self::DIR_ASC;
-
-        return [$order, $direction];
     }
 }

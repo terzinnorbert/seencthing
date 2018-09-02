@@ -10437,6 +10437,34 @@ return jQuery;
 
 /***/ }),
 
+/***/ 2:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* WEBPACK VAR INJECTION */(function($) {class Notify {
+    notify(content, type) {
+        let notification = $('#notify-bar .template').clone().removeClass('template').addClass('show alert-' + type);
+        notification.find('.notify-bar-content').html(content);
+        notification.appendTo('#notify-bar-list');
+
+        setInterval(() => notification.hide('slow', () => notification.remove()), 5000);
+    }
+
+    success(content) {
+        this.notify(content, 'success');
+    }
+
+    danger(content) {
+        this.notify(content, 'danger');
+    }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (new Notify());
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(0)))
+
+/***/ }),
+
 /***/ 42:
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10446,9 +10474,14 @@ module.exports = __webpack_require__(43);
 /***/ }),
 
 /***/ 43:
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function($) {$('#download').click((event) => {
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__notify_ts__ = __webpack_require__(2);
+
+
+$('#download').click((event) => {
     event.preventDefault();
     let url = $(event.target).attr('href');
     axios.post(currentUrl + '/download');
@@ -10468,8 +10501,40 @@ let downloadFile = (url) => {
         $('body').append('<iframe id="download-frame" style="display: none;"></iframe>');
     }
     $('#download-frame').prop('src', url);
-}
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+};
+
+$('.directory-container .list-group-item').click((event) => {
+    let $row = $(event.currentTarget);
+
+    if ('file' == $row.data('type')) {
+        let downloadUrl = currentUrl + '/directory/' + $row.data('id') + '/download';
+
+        axios.post(downloadUrl).then((response) => {
+
+            if (!response.data.success) {
+                __WEBPACK_IMPORTED_MODULE_0__notify_ts__["default"].danger($row.find('.col-name').text() + '<hr>' + response.data.error);
+                return;
+            }
+
+            $row.find('.progress').removeClass('d-none');
+            $row.find('.progress-bar').removeClass('d-none').css('width', '1%');
+            let downloadSate = setInterval(() => {
+                axios.get(currentUrl + '/directory/' + $row.data('id') + '/state').then((response) => {
+                    $row.find('.progress-bar').css('width', response.data.progress + '%');
+                    if (true === response.data.downloadable) {
+                        clearInterval(downloadSate);
+                        $row.find('i.icon').removeClass('far').addClass('fas');
+                        $row.data('state', 2);
+                        downloadFile(downloadUrl);
+                    }
+                });
+            }, 1000);
+        });
+    } else {
+        window.location = $row.data('path');
+    }
+});
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(0)))
 
 /***/ })
 
