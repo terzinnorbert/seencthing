@@ -1,5 +1,6 @@
 import notify from './notify.ts';
 
+require('../../../node_modules/@fancyapps/fancybox/dist/jquery.fancybox.js');
 const ignoreDownload = ['share', 'share-container'];
 
 $('.directory-container .share').click((event) => {
@@ -57,6 +58,14 @@ $('.directory-container .list-group-item').click((event) => {
             }, 1000);
         });
     } else {
+        window.location = $row.data('path');
+    }
+});
+
+$('.directory-container .grid-group-item').click((event) => {
+    let $row = $(event.currentTarget);
+
+    if ('file' != $row.data('type')) {
         window.location = $row.data('path');
     }
 });

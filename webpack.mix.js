@@ -20,6 +20,8 @@ mix.js('resources/assets/js/app.js', 'public/js')
         jquery: ['$', 'global.jQuery', "jQuery", "global.$", "jquery", "global.jquery"]
     });
 
+mix.copy('node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css', 'public/css/jquery.fancybox.min.css');
+
 if (mix.inProduction()) {
     mix.version();
 }

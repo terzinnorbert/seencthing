@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Directory\Preview;
 use Carbon\Carbon;
 use App\Client\Rest;
 use Illuminate\Database\Eloquent\Model;
@@ -22,6 +23,7 @@ class Directory extends Model
         'folder_id',
         'path',
         'name',
+        'preview',
         'type',
         'sync_time',
         'modification_time',
@@ -99,62 +101,19 @@ class Directory extends Model
     }
 
     /**
-     * @param string $path
-     * @return string
-     */
-    public static function generateParentPath($path = '/')
-    {
-        if (is_null($path) || '/' == $path) {
-            return '/';
-        }
-
-        $path = explode('/', $path);
-        if (2 == count($path)) {
-            return self::generateParentPath();
-        }
-
-        return implode('/', array_slice($path, 0, -1));
-    }
-
-    /**
-     * @param string $currentPath
-     * @return array
-     */
-    public static function generateBreadcrumbItems($currentPath = '/')
-    {
-        $breadcrumbs = [];
-        $pathUrl = url()->current().'?path=';
-        if ('/' == $currentPath) {
-            $pieces = [''];
-        } else {
-            $pieces = explode('/', $currentPath);
-        }
-        $isLast = count($pieces) - 1;
-        $currentPath = '';
-
-        foreach ($pieces as $index => $item) {
-
-            if ('/' == $currentPath) {
-                $currentPath = '';
-            }
-
-            $currentPath .= '/'.$item;
-            $breadcrumbs[] = [
-                'name'   => $index ? $item : 'Home',
-                'path'   => $pathUrl.$currentPath,
-                'active' => $isLast === $index,
-            ];
-        }
-
-        return $breadcrumbs;
-    }
-
-    /**
      * @return Folder|\Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function folder()
     {
         return $this->belongsTo('App\Folder');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function shares()
+    {
+        return $this->hasMany(Share::class);
     }
 
     /**
@@ -209,9 +168,20 @@ class Directory extends Model
         return self::generatePath($this->path, $this->name);
     }
 
+    /**
+     * @return mixed
+     */
     public function markToDownload()
     {
         return $this->folder->includeFile($this);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function markToExclude()
+    {
+        return $this->folder->excludeFiles(collect([$this]));
     }
 
     /**
@@ -219,11 +189,12 @@ class Directory extends Model
      */
     public function isDownloadable()
     {
-        $response = app(Rest::class)->getDbFile($this->folder->name, trim($this->getPath(), '/'));
-
-        return false === $response['local']['invalid'] && 100 == $this->progress();
+        return 100 == $this->progress();
     }
 
+    /**
+     * @return float|int
+     */
     public function progress()
     {
         $localSize = 0;
@@ -234,6 +205,9 @@ class Directory extends Model
         return number_format($localSize / (int)$this->size, 0) * 100;
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
     public function download()
     {
         while (!$this->isDownloadable()) {
@@ -272,13 +246,18 @@ class Directory extends Model
         return $this->getStorageBasePath().$this->getPath();
     }
 
-    public function getShareUrl()
+    /**
+     * @param int $type
+     * @return \Illuminate\Contracts\Routing\UrlGenerator|string
+     */
+    public function getShareUrl($type = Share::TYPE_SIMPLE)
     {
-        if (empty($this->hash)) {
-            $this->generateHash();
+        $share = $this->shares()->type($type)->first();
+        if (!$share) {
+            $share = Share::generate($this, $type);
         }
 
-        return url('share/'.$this->hash);
+        return url('share/'.$share->hash);
     }
 
     public function deleteEmptyParentFolders()
@@ -294,14 +273,73 @@ class Directory extends Model
         }
     }
 
-    protected function generateHash()
+    /**
+     * @param $query
+     * @return mixed
+     */
+    public function scopeHasNoPreview($query)
     {
-        do {
-            $hash = str_random(64);
-        } while (Directory::where('hash', $hash)->get()->count());
+        return $query->whereNull('preview')->where(
+            function ($query) {
+                foreach (Preview::getSupportedExtensions() as $extension) {
+                    $query->orWhere('name', 'like', '%.'.$extension);
+                }
+            }
+        );
+    }
 
-        $this->hash = $hash;
+    /**
+     * @return bool
+     */
+    public function hasPreview()
+    {
+        return !empty($this->preview);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPreviewUrl()
+    {
+        return '/'.implode(
+                '/',
+                [
+                    'folders',
+                    $this->folder_id,
+                    'directory',
+                    $this->id,
+                    'preview',
+                ]
+            );
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPreviewable()
+    {
+        return ($this->isFile() && Preview::isSupported($this->name) && !$this->hasPreview());
+    }
+
+    /**
+     * @return bool
+     */
+    public function createPreview()
+    {
+        $this->markToDownload();
+
+        $sleep = 0;
+        do {
+            sleep(2);
+            if (++$sleep > 30) {
+                return false;
+            }
+        } while (!$this->isDownloadable());
+        $this->preview = Preview::create($this->getStoragePath());
         $this->save();
+
+
+        $this->markToExclude();
     }
 
     /**
